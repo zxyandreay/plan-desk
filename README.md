@@ -196,7 +196,21 @@ src-tauri/
 
 ## Versioning
 
-PlanDesk treats meaningful fixes, additions, packaging updates, and production polish as release changes. Future updates should include an appropriate version bump across npm, Tauri, Cargo, visible app text, release filenames, and `CHANGELOG.md`.
+PlanDesk uses semantic versioning and annotated Git tags. Release tags use the format:
+
+```text
+vX.Y.Z
+```
+
+Example:
+
+```text
+v1.1.2
+```
+
+Every official release should include an updated app version, release commit, annotated Git tag, rebuilt Windows installer, GitHub Release notes, and uploaded installer artifacts.
+
+For full details, see [VERSIONING.md](./VERSIONING.md).
 
 ## License
 

@@ -7,6 +7,9 @@ All meaningful fixes, additions, and release packaging changes should include an
 - Rebuilt Windows release outputs with `PlanDesk` as the main binary name.
 - Added a versioned direct EXE release artifact to avoid stale Windows Explorer icon cache entries.
 - Refreshed the Windows shell icon cache at the end of the local release build script.
+- Organized release versioning, annotated tag workflow, and GitHub release note configuration.
+- Added `VERSIONING.md` and a version consistency check script.
+- Documented historical tag reconstruction status and future release rules.
 
 ## 1.1.1 - 2026-05-11
 
@@ -25,6 +28,7 @@ All meaningful fixes, additions, and release packaging changes should include an
 - Added production dark-mode styling for the existing interface.
 - Polished local app wording and release build metadata.
 
-## 1.0.0 - 2026-05-11
+## 1.0.0 - Historical / Unverified
 
-- Initial Windows desktop release of PlanDesk.
+- A `1.0.0` release was requested historically, but no commit in this repository confidently contains app version `1.0.0`.
+- Do not reconstruct `v1.0.0` without stronger evidence.

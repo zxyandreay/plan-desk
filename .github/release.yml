@@ -1,0 +1,56 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+      - dependabot[bot]
+
+  categories:
+    - title: "✨ New Features"
+      labels:
+        - feature
+        - enhancement
+        - feat
+
+    - title: "🐛 Fixes"
+      labels:
+        - bug
+        - fix
+
+    - title: "🎨 UI / UX Improvements"
+      labels:
+        - ui
+        - ux
+        - design
+        - polish
+
+    - title: "🌓 Theme / Dark Mode"
+      labels:
+        - theme
+        - dark-mode
+
+    - title: "📁 Files & Resources"
+      labels:
+        - resources
+        - files
+        - folders
+
+    - title: "📦 Build & Release"
+      labels:
+        - build
+        - release
+        - installer
+        - versioning
+
+    - title: "🧹 Maintenance"
+      labels:
+        - refactor
+        - cleanup
+        - chore
+        - documentation
+        - docs
+
+    - title: Other Changes
+      labels:
+        - "*"

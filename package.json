@@ -12,6 +12,8 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "version:check": "node scripts/check-version.mjs",
+    "release:build": "npm.cmd run desktop:build",
     "desktop:setup": "powershell -ExecutionPolicy Bypass -File scripts/setup-windows-prereqs.ps1",
     "desktop:build": "powershell -ExecutionPolicy Bypass -File scripts/build-windows-exe.ps1"
   },
