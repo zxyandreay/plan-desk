@@ -123,18 +123,20 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
     )
 
   return (
-    <div className="mx-auto max-w-7xl space-y-5 px-6 py-6">
-      <header className="rounded-lg border border-slate-200 bg-white p-5">
+    <div className="pd-page space-y-5">
+      <header className="pd-card p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-2xl font-semibold tracking-normal text-slate-950">{project.name}</h2>
+              <h2 className="text-2xl font-semibold tracking-normal text-[color:var(--pd-foreground-strong)]">
+                {project.name}
+              </h2>
               <Badge tone="blue">{projectStatusLabels[project.status]}</Badge>
               <Badge tone={project.priority === 'high' ? 'red' : 'slate'}>
                 {projectPriorityLabels[project.priority]}
               </Badge>
             </div>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-[color:var(--pd-muted-foreground)]">
               {project.category || 'Uncategorized'} · Due {formatDate(project.dueDate)}
             </p>
           </div>
@@ -163,25 +165,25 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.9fr]">
           <ProgressBar value={progress} label={`${progress}% complete`} />
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+          <div className="pd-muted-panel px-3 py-2 text-sm">
             {project.rootFolderPath ? (
               <div className="flex flex-wrap items-center gap-2">
                 <FolderOpen className="h-4 w-4 text-blue-700" />
-                <span className="font-medium text-slate-700">Root folder:</span>
-                <span className="text-slate-600" title={project.rootFolderPath}>
+                <span className="font-medium text-[color:var(--pd-foreground)]">Root folder:</span>
+                <span className="pd-path max-w-full" title={project.rootFolderPath}>
                   {compactPath(project.rootFolderPath)}
                 </span>
                 {missingRoot ? <Badge tone="red">Missing</Badge> : null}
                 {project.rootFolderStatus === 'unknown' ? <Badge tone="amber">Unchecked</Badge> : null}
               </div>
             ) : (
-              <span className="text-slate-500">No root folder linked yet.</span>
+              <span className="text-[color:var(--pd-muted-foreground)]">No root folder linked yet.</span>
             )}
           </div>
         </div>
       </header>
 
-      <nav className="flex gap-1 overflow-x-auto rounded-lg border border-slate-200 bg-white p-1 scrollbar-thin">
+      <nav className="pd-toolbar flex gap-1 overflow-x-auto p-1 scrollbar-thin">
         {tabs.map((tab) => {
           const Icon = tab.icon
           const active = activeProjectTab === tab.id
@@ -191,7 +193,9 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
               type="button"
               onClick={() => setProjectTab(tab.id)}
               className={`flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition ${
-                active ? 'bg-blue-700 text-white' : 'text-slate-600 hover:bg-slate-100'
+                active
+                  ? 'bg-[color:var(--pd-primary)] text-[color:var(--pd-primary-foreground)] shadow-sm'
+                  : 'text-[color:var(--pd-muted-foreground)] hover:bg-[color:var(--pd-muted)] hover:text-[color:var(--pd-foreground-strong)]'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -240,8 +244,8 @@ function ProjectOverview({ projectId }: { projectId: string }) {
   return (
     <div className="grid gap-5 lg:grid-cols-[1.3fr_0.7fr]">
       <section className="space-y-5">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h3 className="text-base font-semibold text-slate-950">Project brief</h3>
+        <div className="pd-panel p-5">
+          <h3 className="pd-section-title">Project brief</h3>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <InfoBlock title="Description" text={project.description || 'No description yet.'} />
             <InfoBlock title="Goal" text={project.goal || 'No goal defined yet.'} />
@@ -254,8 +258,8 @@ function ProjectOverview({ projectId }: { projectId: string }) {
           <SummaryCard label="Notes" value={notes.length} />
           <SummaryCard label="Resources" value={resources.length} />
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h3 className="text-base font-semibold text-slate-950">Quick actions</h3>
+        <div className="pd-panel p-5">
+          <h3 className="pd-section-title">Quick actions</h3>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button onClick={() => setProjectTab('tasks')}>Add task</Button>
             <Button onClick={() => setProjectTab('milestones')}>Add milestone</Button>
@@ -267,31 +271,33 @@ function ProjectOverview({ projectId }: { projectId: string }) {
         </div>
       </section>
       <aside className="space-y-5">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h3 className="text-base font-semibold text-slate-950">Upcoming deadlines</h3>
+        <div className="pd-panel p-5">
+          <h3 className="pd-section-title">Upcoming deadlines</h3>
           <div className="mt-3 space-y-2">
             {tasks
               .filter((task) => task.status !== 'done' && task.dueDate)
               .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
               .slice(0, 5)
               .map((task) => (
-                <div key={task.id} className="rounded-md bg-slate-50 px-3 py-2">
-                  <div className="text-sm font-medium text-slate-800">{task.title}</div>
-                  <div className="text-xs text-slate-500">{formatDate(task.dueDate)}</div>
+                <div key={task.id} className="pd-row px-3 py-2">
+                  <div className="text-sm font-medium text-[color:var(--pd-foreground)]">{task.title}</div>
+                  <div className="text-xs text-[color:var(--pd-muted-foreground)]">
+                    {formatDate(task.dueDate)}
+                  </div>
                 </div>
               ))}
             {!tasks.some((task) => task.status !== 'done' && task.dueDate) ? (
-              <p className="text-sm text-slate-500">No upcoming task deadlines.</p>
+              <p className="text-sm text-[color:var(--pd-muted-foreground)]">No upcoming task deadlines.</p>
             ) : null}
           </div>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h3 className="text-base font-semibold text-slate-950">Recently updated</h3>
+        <div className="pd-panel p-5">
+          <h3 className="pd-section-title">Recently updated</h3>
           <div className="mt-3 space-y-2">
             {updatedItems.map((item) => (
-              <div key={`${item.kind}-${item.label}-${item.updatedAt}`} className="rounded-md bg-slate-50 px-3 py-2">
-                <div className="text-sm font-medium text-slate-800">{item.label}</div>
-                <div className="text-xs text-slate-500">
+              <div key={`${item.kind}-${item.label}-${item.updatedAt}`} className="pd-row px-3 py-2">
+                <div className="text-sm font-medium text-[color:var(--pd-foreground)]">{item.label}</div>
+                <div className="text-xs text-[color:var(--pd-muted-foreground)]">
                   {item.kind} · {formatDate(item.updatedAt)}
                 </div>
               </div>
@@ -305,18 +311,18 @@ function ProjectOverview({ projectId }: { projectId: string }) {
 
 function InfoBlock({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-      <h4 className="text-sm font-semibold text-slate-950">{title}</h4>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
+    <div className="pd-muted-panel p-4">
+      <h4 className="text-sm font-semibold text-[color:var(--pd-foreground-strong)]">{title}</h4>
+      <p className="mt-2 text-sm leading-6 text-[color:var(--pd-muted-foreground)]">{text}</p>
     </div>
   )
 }
 
 function SummaryCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <div className="text-sm text-slate-500">{label}</div>
-      <div className="mt-2 text-2xl font-semibold text-slate-950">{value}</div>
+    <div className="pd-card p-4">
+      <div className="text-sm text-[color:var(--pd-muted-foreground)]">{label}</div>
+      <div className="mt-2 text-2xl font-semibold text-[color:var(--pd-foreground-strong)]">{value}</div>
     </div>
   )
 }

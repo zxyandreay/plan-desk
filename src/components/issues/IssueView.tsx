@@ -51,8 +51,10 @@ export function IssueView({ projectId }: IssueViewProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">Issues</h3>
-          <p className="text-sm text-slate-500">Track blockers, risks, and decisions separately from tasks.</p>
+          <h3 className="text-lg font-semibold text-[color:var(--pd-foreground-strong)]">Issues</h3>
+          <p className="text-sm text-[color:var(--pd-muted-foreground)]">
+            Track blockers, risks, and decisions separately from tasks.
+          </p>
         </div>
         <Button
           variant="primary"
@@ -72,11 +74,11 @@ export function IssueView({ projectId }: IssueViewProps) {
             const relatedTask = tasks.find((task) => task.id === issue.relatedTaskId)
             const linkedResources = resourceCountForEntity(resources, 'issue', issue.id)
             return (
-              <article key={issue.id} className="rounded-lg border border-slate-200 bg-white p-4">
+              <article key={issue.id} className="pd-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h4 className="font-semibold text-slate-950">{issue.title}</h4>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                    <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{issue.title}</h4>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pd-muted-foreground)]">
                       {issue.description || 'No description.'}
                     </p>
                   </div>
@@ -96,8 +98,10 @@ export function IssueView({ projectId }: IssueViewProps) {
                     {issue.resolutionNotes}
                   </div>
                 ) : null}
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
-                  <span className="text-xs text-slate-500">Created {formatDate(issue.createdAt)}</span>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--pd-border)] pt-3">
+                  <span className="text-xs text-[color:var(--pd-muted-foreground)]">
+                    Created {formatDate(issue.createdAt)}
+                  </span>
                   <div className="flex flex-wrap gap-2">
                     <Button size="sm" icon={<Link2 className="h-4 w-4" />} onClick={() => setResourceTarget(issue)}>
                       Link

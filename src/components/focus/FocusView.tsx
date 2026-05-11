@@ -21,11 +21,11 @@ export function FocusView() {
     focus.missingResources.length
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-6 py-6">
+    <div className="pd-page space-y-6">
       <header>
-        <p className="text-sm font-medium text-blue-700">What needs attention</p>
-        <h2 className="mt-1 text-3xl font-semibold tracking-normal text-slate-950">Focus</h2>
-        <p className="mt-2 max-w-2xl text-sm text-slate-500">
+        <p className="pd-eyebrow">What needs attention</p>
+        <h2 className="pd-page-title">Focus</h2>
+        <p className="pd-page-description">
           Overdue work, near deadlines, blockers, critical issues, and missing linked resources.
         </p>
       </header>
@@ -93,10 +93,10 @@ function TaskPanel({
   data: ReturnType<typeof useAppStore.getState>['data']
 }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4">
+    <section className="pd-panel">
       <div className="mb-3 flex items-center gap-2">
         {icon}
-        <h3 className="font-semibold text-slate-950">{title}</h3>
+        <h3 className="pd-section-title">{title}</h3>
       </div>
       {tasks.length ? (
         <div className="space-y-2">
@@ -107,15 +107,15 @@ function TaskPanel({
                 key={task.id}
                 type="button"
                 onClick={() => onOpen(task.projectId)}
-                className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-left hover:bg-blue-50"
+                className="pd-row w-full px-3 py-2 text-left"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium text-slate-900">{task.title}</span>
+                  <span className="font-medium text-[color:var(--pd-foreground-strong)]">{task.title}</span>
                   <Badge tone={task.priority === 'urgent' ? 'red' : 'amber'}>
                     {taskPriorityLabels[task.priority]}
                   </Badge>
                 </div>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">
                   {project?.name ?? 'Project'} · {taskStatusLabels[task.status]} · Due {formatDate(task.dueDate)}
                 </div>
               </button>
@@ -123,7 +123,7 @@ function TaskPanel({
           })}
         </div>
       ) : (
-        <p className="text-sm text-slate-500">{empty}</p>
+        <p className="text-sm text-[color:var(--pd-muted-foreground)]">{empty}</p>
       )}
     </section>
   )
@@ -139,10 +139,10 @@ function IssuePanel({
   data: ReturnType<typeof useAppStore.getState>['data']
 }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4">
+    <section className="pd-panel">
       <div className="mb-3 flex items-center gap-2">
         <AlertTriangle className="h-5 w-5 text-red-600" />
-        <h3 className="font-semibold text-slate-950">Critical and high issues</h3>
+        <h3 className="pd-section-title">Critical and high issues</h3>
       </div>
       {issues.length ? (
         <div className="space-y-2">
@@ -153,21 +153,23 @@ function IssuePanel({
                 key={issue.id}
                 type="button"
                 onClick={() => onOpen(issue.projectId)}
-                className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-left hover:bg-blue-50"
+                className="pd-row w-full px-3 py-2 text-left"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium text-slate-900">{issue.title}</span>
+                  <span className="font-medium text-[color:var(--pd-foreground-strong)]">{issue.title}</span>
                   <Badge tone={issue.severity === 'critical' ? 'red' : 'amber'}>
                     {issueSeverityLabels[issue.severity]}
                   </Badge>
                 </div>
-                <div className="mt-1 text-xs text-slate-500">{project?.name ?? 'Project'}</div>
+                <div className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">
+                  {project?.name ?? 'Project'}
+                </div>
               </button>
             )
           })}
         </div>
       ) : (
-        <p className="text-sm text-slate-500">No high or critical open issues.</p>
+        <p className="text-sm text-[color:var(--pd-muted-foreground)]">No high or critical open issues.</p>
       )}
     </section>
   )
@@ -183,10 +185,10 @@ function ResourcePanel({
   data: ReturnType<typeof useAppStore.getState>['data']
 }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4">
+    <section className="pd-panel">
       <div className="mb-3 flex items-center gap-2">
         <FileWarning className="h-5 w-5 text-amber-600" />
-        <h3 className="font-semibold text-slate-950">Missing resources</h3>
+        <h3 className="pd-section-title">Missing resources</h3>
       </div>
       {resources.length ? (
         <div className="space-y-2">
@@ -197,19 +199,21 @@ function ResourcePanel({
                 key={resource.id}
                 type="button"
                 onClick={() => onOpen(resource.projectId)}
-                className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-left hover:bg-blue-50"
+                className="pd-row pd-danger-row w-full px-3 py-2 text-left"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium text-slate-900">{resource.label}</span>
+                  <span className="font-medium text-[color:var(--pd-foreground-strong)]">{resource.label}</span>
                   <Badge tone="red">Missing</Badge>
                 </div>
-                <div className="mt-1 text-xs text-slate-500">{project?.name ?? 'Project'}</div>
+                <div className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">
+                  {project?.name ?? 'Project'}
+                </div>
               </button>
             )
           })}
         </div>
       ) : (
-        <p className="text-sm text-slate-500">No missing linked resources.</p>
+        <p className="text-sm text-[color:var(--pd-muted-foreground)]">No missing linked resources.</p>
       )}
     </section>
   )

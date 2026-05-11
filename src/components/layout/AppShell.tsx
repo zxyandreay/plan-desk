@@ -51,16 +51,20 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="flex h-screen bg-slate-100 text-slate-900">
-      <aside className="flex w-72 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-5 py-5">
+    <div className="pd-app flex h-screen">
+      <aside className="pd-sidebar flex w-72 shrink-0 flex-col border-r">
+        <div className="border-b border-[color:var(--pd-border)] px-5 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-700 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--pd-primary)] text-[color:var(--pd-primary-foreground)] shadow-sm">
               <FolderKanban className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold tracking-normal text-slate-950">PlanDesk</h1>
-              <p className="text-xs text-slate-500">Plan projects. Track tasks. Finish work.</p>
+              <h1 className="text-lg font-semibold tracking-normal text-[color:var(--pd-foreground-strong)]">
+                PlanDesk
+              </h1>
+              <p className="text-xs text-[color:var(--pd-muted-foreground)]">
+                Plan projects. Track tasks. Finish work.
+              </p>
             </div>
           </div>
           <Button
@@ -72,7 +76,7 @@ export function AppShell({ children }: AppShellProps) {
             New project
           </Button>
         </div>
-        <nav className="space-y-1 border-b border-slate-200 p-3" aria-label="Main navigation">
+        <nav className="space-y-1 border-b border-[color:var(--pd-border)] p-3" aria-label="Main navigation">
           {navItems.map((item) => {
             const Icon = item.icon
             const active = activeView === item.id
@@ -82,8 +86,10 @@ export function AppShell({ children }: AppShellProps) {
                 type="button"
                 onClick={() => setActiveView(item.id)}
                 className={cn(
-                  'flex h-10 w-full items-center gap-3 rounded-md px-3 text-left text-sm font-medium transition',
-                  active ? 'bg-blue-50 text-blue-800' : 'text-slate-600 hover:bg-slate-100',
+                  'flex h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-medium transition',
+                  active
+                    ? 'bg-[color:var(--pd-accent)] text-[color:var(--pd-accent-foreground)] shadow-sm'
+                    : 'text-[color:var(--pd-muted-foreground)] hover:bg-[color:var(--pd-muted)] hover:text-[color:var(--pd-foreground-strong)]',
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -94,13 +100,13 @@ export function AppShell({ children }: AppShellProps) {
         </nav>
         <div className="flex min-h-0 flex-1 flex-col p-3">
           <div className="relative mb-3">
-            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[color:var(--pd-subtle-foreground)]" />
             <input
               aria-label="Search projects"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search projects"
-              className="h-9 w-full rounded-md border border-slate-300 bg-white pl-9 pr-3 text-sm"
+              className="pd-input h-9 w-full pl-9 pr-3 text-sm"
             />
           </div>
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 scrollbar-thin">
@@ -113,21 +119,21 @@ export function AppShell({ children }: AppShellProps) {
                   type="button"
                   onClick={() => setActiveProject(project.id)}
                   className={cn(
-                    'w-full rounded-lg border px-3 py-3 text-left transition',
+                    'w-full rounded-xl border px-3 py-3 text-left transition',
                     active
-                      ? 'border-blue-200 bg-blue-50'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50',
+                      ? 'border-[color:var(--pd-primary)] bg-[color:var(--pd-accent)] shadow-sm'
+                      : 'border-[color:var(--pd-border)] bg-[color:var(--pd-card)] hover:border-[color:var(--pd-border-strong)] hover:bg-[color:var(--pd-card-hover)]',
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="line-clamp-2 text-sm font-semibold text-slate-950">
+                    <span className="line-clamp-2 text-sm font-semibold text-[color:var(--pd-foreground-strong)]">
                       {project.name}
                     </span>
-                    <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
+                    <span className="shrink-0 rounded-md bg-[color:var(--pd-muted)] px-1.5 py-0.5 text-[11px] text-[color:var(--pd-muted-foreground)]">
                       {progress}%
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center justify-between gap-2 text-xs text-slate-500">
+                  <div className="mt-2 flex items-center justify-between gap-2 text-xs text-[color:var(--pd-muted-foreground)]">
                     <span>{project.category || 'Uncategorized'}</span>
                     <span>{projectStatusLabels[project.status]}</span>
                   </div>
@@ -135,13 +141,13 @@ export function AppShell({ children }: AppShellProps) {
               )
             })}
             {!filteredProjects.length ? (
-              <p className="rounded-lg border border-dashed border-slate-300 px-3 py-5 text-center text-sm text-slate-500">
+              <p className="rounded-xl border border-dashed border-[color:var(--pd-border-strong)] px-3 py-5 text-center text-sm text-[color:var(--pd-muted-foreground)]">
                 No matching projects.
               </p>
             ) : null}
           </div>
         </div>
-        <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
+        <div className="border-t border-[color:var(--pd-border)] px-4 py-3 text-xs text-[color:var(--pd-muted-foreground)]">
           {isSaving ? 'Saving locally...' : 'Stored locally in this workspace'}
         </div>
       </aside>

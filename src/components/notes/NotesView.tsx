@@ -48,8 +48,10 @@ export function NotesView({ projectId }: NotesViewProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">Notes</h3>
-          <p className="text-sm text-slate-500">Keep context, decisions, reminders, and references with the project.</p>
+          <h3 className="text-lg font-semibold text-[color:var(--pd-foreground-strong)]">Notes</h3>
+          <p className="text-sm text-[color:var(--pd-muted-foreground)]">
+            Keep context, decisions, reminders, and references with the project.
+          </p>
         </div>
         <Button
           variant="primary"
@@ -68,17 +70,17 @@ export function NotesView({ projectId }: NotesViewProps) {
           {notes.map((note) => {
             const linkedResources = resourceCountForEntity(resources, 'note', note.id)
             return (
-              <article key={note.id} className="rounded-lg border border-slate-200 bg-white p-4">
+              <article key={note.id} className="pd-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h4 className="font-semibold text-slate-950">{note.title}</h4>
-                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                    <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{note.title}</h4>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[color:var(--pd-muted-foreground)]">
                       {note.content || 'No note content yet.'}
                     </p>
                   </div>
                 </div>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
-                  <span className="text-xs text-slate-500">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--pd-border)] pt-3">
+                  <span className="text-xs text-[color:var(--pd-muted-foreground)]">
                     Updated {formatDate(note.updatedAt)} · {linkedResources} resources
                   </span>
                   <div className="flex flex-wrap gap-2">

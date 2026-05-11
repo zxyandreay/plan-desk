@@ -11,10 +11,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'border-blue-700 bg-blue-700 text-white hover:bg-blue-800',
-  secondary: 'border-slate-300 bg-white text-slate-800 hover:bg-slate-50',
-  ghost: 'border-transparent bg-transparent text-slate-700 hover:bg-slate-100',
-  danger: 'border-red-600 bg-red-600 text-white hover:bg-red-700',
+  primary:
+    'border-[color:var(--pd-primary)] bg-[color:var(--pd-primary)] text-[color:var(--pd-primary-foreground)] hover:border-[color:var(--pd-primary-hover)] hover:bg-[color:var(--pd-primary-hover)]',
+  secondary:
+    'border-[color:var(--pd-border)] bg-[color:var(--pd-card)] text-[color:var(--pd-foreground)] hover:border-[color:var(--pd-border-strong)] hover:bg-[color:var(--pd-card-hover)]',
+  ghost:
+    'border-transparent bg-transparent text-[color:var(--pd-muted-foreground)] hover:bg-[color:var(--pd-muted)] hover:text-[color:var(--pd-foreground-strong)]',
+  danger:
+    'border-[color:var(--pd-destructive)] bg-[color:var(--pd-destructive)] text-[color:var(--pd-destructive-button-foreground)] hover:border-[color:var(--pd-destructive-hover)] hover:bg-[color:var(--pd-destructive-hover)]',
 }
 
 const sizes: Record<ButtonSize, string> = {
@@ -35,7 +39,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md border font-medium transition disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center gap-2 rounded-md border font-medium shadow-sm transition active:translate-y-px disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50',
         variants[variant],
         sizes[size],
         className,

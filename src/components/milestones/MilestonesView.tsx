@@ -54,8 +54,10 @@ export function MilestonesView({ projectId }: MilestonesViewProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">Milestones</h3>
-          <p className="text-sm text-slate-500">Plan major phases and connect phase-specific files.</p>
+          <h3 className="text-lg font-semibold text-[color:var(--pd-foreground-strong)]">Milestones</h3>
+          <p className="text-sm text-[color:var(--pd-muted-foreground)]">
+            Plan major phases and connect phase-specific files.
+          </p>
         </div>
         <Button
           variant="primary"
@@ -77,11 +79,15 @@ export function MilestonesView({ projectId }: MilestonesViewProps) {
             const progress = calculateMilestoneProgress(data, milestone.id)
             const linkedResources = resourceCountForEntity(resources, 'milestone', milestone.id)
             return (
-              <article key={milestone.id} className="rounded-lg border border-slate-200 bg-white p-4">
+              <article key={milestone.id} className="pd-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h4 className="font-semibold text-slate-950">{milestone.title}</h4>
-                    <p className="mt-1 text-sm text-slate-500">{milestone.description || 'No description.'}</p>
+                    <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">
+                      {milestone.title}
+                    </h4>
+                    <p className="mt-1 text-sm text-[color:var(--pd-muted-foreground)]">
+                      {milestone.description || 'No description.'}
+                    </p>
                   </div>
                   <Badge tone={milestone.status === 'completed' ? 'green' : 'blue'}>
                     {milestoneStatusLabels[milestone.status]}
@@ -90,11 +96,11 @@ export function MilestonesView({ projectId }: MilestonesViewProps) {
                 <div className="mt-4">
                   <ProgressBar value={progress} label={`${completed}/${milestoneTasks.length} tasks complete`} />
                 </div>
-                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-[color:var(--pd-muted-foreground)]">
                   <span>Due {formatDate(milestone.dueDate)}</span>
                   <span>{linkedResources} resources</span>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+                <div className="mt-4 flex flex-wrap gap-2 border-t border-[color:var(--pd-border)] pt-3">
                   <Button size="sm" icon={<Link2 className="h-4 w-4" />} onClick={() => setResourceTarget(milestone)}>
                     Link file/folder
                   </Button>

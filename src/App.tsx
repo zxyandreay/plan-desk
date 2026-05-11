@@ -24,9 +24,9 @@ function App() {
 
   if (!isReady) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-100 text-slate-700">
-        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-5 py-4 shadow-sm">
-          <Loader2 className="h-5 w-5 animate-spin text-blue-700" />
+      <div className="pd-app flex h-screen items-center justify-center">
+        <div className="pd-card flex items-center gap-3 px-5 py-4 text-sm font-medium">
+          <Loader2 className="h-5 w-5 animate-spin text-[color:var(--pd-primary)]" />
           Loading PlanDesk
         </div>
       </div>

@@ -115,11 +115,11 @@ export function ProjectForm({ project, onCancel, onSubmit }: ProjectFormProps) {
         onChange={(event) => updateValue('goal', event.target.value)}
         placeholder="What does finished look like?"
       />
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div className="pd-muted-panel p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-950">Project root folder</h3>
-            <p className="mt-1 text-xs text-slate-500">
+            <h3 className="text-sm font-semibold text-[color:var(--pd-foreground-strong)]">Project root folder</h3>
+            <p className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">
               PlanDesk stores this path as a reference only.
             </p>
           </div>

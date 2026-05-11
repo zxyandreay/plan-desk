@@ -109,11 +109,11 @@ The build script runs install, typecheck, lint, and Tauri's NSIS build. It copie
 
 ```text
 release/
-  PlanDesk_1.0.1_x64-setup.exe
+  PlanDesk_1.1.0_x64-setup.exe
   PlanDesk.exe
 ```
 
-Use `PlanDesk_1.0.1_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk.exe` when you want to launch the built app directly from the release folder.
+Use `PlanDesk_1.1.0_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk.exe` when you want to launch the built app directly from the release folder.
 
 Tauri uses Microsoft WebView2 internally to render the app window, but PlanDesk opens like a normal desktop app. No browser tab or Vite dev server is needed after building.
 

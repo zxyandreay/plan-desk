@@ -87,17 +87,17 @@ export function TasksView({ projectId }: TasksViewProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">Tasks</h3>
-          <p className="text-sm text-slate-500">Manage the work in board or list view.</p>
+          <h3 className="text-lg font-semibold text-[color:var(--pd-foreground-strong)]">Tasks</h3>
+          <p className="text-sm text-[color:var(--pd-muted-foreground)]">Manage the work in board or list view.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <div className="rounded-md border border-slate-300 bg-white p-1">
+          <div className="pd-segmented">
             <button
               type="button"
               onClick={() => setTaskView('board')}
               className={cn(
-                'h-7 rounded px-3 text-sm font-medium',
-                taskView === 'board' ? 'bg-blue-700 text-white' : 'text-slate-600',
+                'pd-segment',
+                taskView === 'board' ? 'pd-segment-active' : '',
               )}
             >
               Board
@@ -106,8 +106,8 @@ export function TasksView({ projectId }: TasksViewProps) {
               type="button"
               onClick={() => setTaskView('list')}
               className={cn(
-                'h-7 rounded px-3 text-sm font-medium',
-                taskView === 'list' ? 'bg-blue-700 text-white' : 'text-slate-600',
+                'pd-segment',
+                taskView === 'list' ? 'pd-segment-active' : '',
               )}
             >
               List
@@ -126,23 +126,23 @@ export function TasksView({ projectId }: TasksViewProps) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="pd-toolbar p-4">
         <div className="grid gap-3 md:grid-cols-5">
           <div className="relative md:col-span-2">
-            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[color:var(--pd-subtle-foreground)]" />
             <input
               aria-label="Search tasks"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search tasks"
-              className="h-9 w-full rounded-md border border-slate-300 pl-9 pr-3 text-sm"
+              className="pd-input h-9 w-full pl-9 pr-3 text-sm"
             />
           </div>
           <select
             aria-label="Filter status"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value as 'all' | TaskStatus)}
-            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+            className="pd-input h-9 px-3 text-sm"
           >
             <option value="all">All statuses</option>
             {taskStatuses.map((status) => (
@@ -155,7 +155,7 @@ export function TasksView({ projectId }: TasksViewProps) {
             aria-label="Filter priority"
             value={priorityFilter}
             onChange={(event) => setPriorityFilter(event.target.value as 'all' | TaskPriority)}
-            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+            className="pd-input h-9 px-3 text-sm"
           >
             <option value="all">All priorities</option>
             {taskPriorities.map((priority) => (
@@ -168,7 +168,7 @@ export function TasksView({ projectId }: TasksViewProps) {
             aria-label="Filter milestone"
             value={milestoneFilter}
             onChange={(event) => setMilestoneFilter(event.target.value)}
-            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+            className="pd-input h-9 px-3 text-sm"
           >
             <option value="all">All milestones</option>
             {milestones.map((milestone) => (
@@ -299,13 +299,15 @@ function TaskColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        'rounded-lg border border-slate-200 bg-slate-50 p-3',
-        isOver ? 'border-blue-400 bg-blue-50' : '',
+        'pd-muted-panel p-3 transition',
+        isOver ? 'border-[color:var(--pd-primary)] bg-[color:var(--pd-accent)]' : '',
       )}
     >
       <div className="mb-3 flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-slate-800">{taskStatusLabels[status]}</h4>
-        <span className="rounded bg-white px-2 py-0.5 text-xs text-slate-500">{tasks.length}</span>
+        <h4 className="text-sm font-semibold text-[color:var(--pd-foreground)]">{taskStatusLabels[status]}</h4>
+        <span className="rounded-md bg-[color:var(--pd-card)] px-2 py-0.5 text-xs text-[color:var(--pd-muted-foreground)]">
+          {tasks.length}
+        </span>
       </div>
       <div className="space-y-3">
         {tasks.map((task) => (
@@ -371,12 +373,14 @@ function TaskCard({
   const overdue = isPastDate(task.dueDate) && task.status !== 'done'
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+    <article className="pd-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h4 className="font-semibold text-slate-950">{task.title}</h4>
+          <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{task.title}</h4>
           {!compact && task.description ? (
-            <p className="mt-2 text-sm leading-6 text-slate-600">{task.description}</p>
+            <p className="mt-2 text-sm leading-6 text-[color:var(--pd-muted-foreground)]">
+              {task.description}
+            </p>
           ) : null}
         </div>
         <Badge tone={task.priority === 'urgent' ? 'red' : task.priority === 'high' ? 'amber' : 'slate'}>
@@ -395,7 +399,7 @@ function TaskCard({
           </Badge>
         ))}
       </div>
-      <div className="mt-3 grid gap-2 text-xs text-slate-500 md:grid-cols-3">
+      <div className="mt-3 grid gap-2 text-xs text-[color:var(--pd-muted-foreground)] md:grid-cols-3">
         <span>Due {formatDate(task.dueDate)}</span>
         <span>{linkedResources} resources</span>
         <span>{task.assignee || 'Unassigned'}</span>
@@ -406,7 +410,10 @@ function TaskCard({
           {!compact ? (
             <div className="mt-2 space-y-1">
               {task.subtasks.map((subtask) => (
-                <label key={subtask.id} className="flex items-center gap-2 text-sm text-slate-600">
+                <label
+                  key={subtask.id}
+                  className="flex items-center gap-2 text-sm text-[color:var(--pd-muted-foreground)]"
+                >
                   <input
                     type="checkbox"
                     checked={subtask.completed}
@@ -419,7 +426,7 @@ function TaskCard({
           ) : null}
         </div>
       ) : null}
-      <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-[color:var(--pd-border)] pt-3">
         <Button size="sm" icon={<Link2 className="h-4 w-4" />} onClick={onLink}>
           Link
         </Button>

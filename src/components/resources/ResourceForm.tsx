@@ -109,7 +109,7 @@ export function ResourceForm({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <div className="pd-muted-panel flex flex-wrap gap-2 p-3">
         <Button icon={<FolderOpen className="h-4 w-4" />} onClick={() => pickPath('folder')}>
           Choose folder
         </Button>

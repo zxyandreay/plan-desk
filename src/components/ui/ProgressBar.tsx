@@ -8,10 +8,10 @@ export function ProgressBar({ value, label }: ProgressBarProps) {
 
   return (
     <div className="space-y-1">
-      {label ? <div className="text-xs font-medium text-slate-600">{label}</div> : null}
-      <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+      {label ? <div className="text-xs font-medium text-[color:var(--pd-muted-foreground)]">{label}</div> : null}
+      <div className="h-2 overflow-hidden rounded-full bg-[color:var(--pd-muted)]">
         <div
-          className="h-full rounded-full bg-blue-700 transition-all"
+          className="h-full rounded-full bg-[color:var(--pd-primary)] transition-all"
           style={{ width: `${normalized}%` }}
         />
       </div>

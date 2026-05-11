@@ -19,16 +19,18 @@ export function ResourceCard({ data, resource, onEdit, onDelete }: ResourceCardP
   const Icon = resource.type === 'folder' ? Folder : File
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-4">
+    <article className={`pd-card p-4 ${resource.isMissing ? 'pd-danger-row' : ''}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <Icon className="h-5 w-5 text-blue-700" />
-            <h4 className="font-semibold text-slate-950">{resource.label}</h4>
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-[color:var(--pd-muted)] text-[color:var(--pd-accent-foreground)]">
+              <Icon className="h-5 w-5" />
+            </span>
+            <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{resource.label}</h4>
             {resource.isMissing ? <Badge tone="red">Missing</Badge> : null}
             {resource.pathHealth === 'unknown' ? <Badge tone="amber">Unchecked</Badge> : null}
           </div>
-          <p className="mt-2 text-sm text-slate-500" title={resource.path}>
+          <p className="pd-path mt-2 max-w-full text-sm" title={resource.path}>
             {compactPath(resource.path, 86)}
           </p>
         </div>
@@ -63,10 +65,10 @@ export function ResourceCard({ data, resource, onEdit, onDelete }: ResourceCardP
         ))}
       </div>
       {resource.description ? (
-        <p className="mt-3 text-sm leading-6 text-slate-600">{resource.description}</p>
+        <p className="mt-3 text-sm leading-6 text-[color:var(--pd-muted-foreground)]">{resource.description}</p>
       ) : null}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
-        <p className="text-xs text-slate-500">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--pd-border)] pt-3">
+        <p className="text-xs text-[color:var(--pd-muted-foreground)]">
           Created {formatDate(resource.createdAt)} · Updated {formatDate(resource.updatedAt)}
         </p>
         <ResourceActions resource={resource} />

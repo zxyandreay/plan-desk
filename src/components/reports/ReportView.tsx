@@ -36,8 +36,8 @@ export function ReportView({ projectId }: ReportViewProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">Report / Export</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="text-lg font-semibold text-[color:var(--pd-foreground-strong)]">Report / Export</h3>
+          <p className="text-sm text-[color:var(--pd-muted-foreground)]">
             Export project progress and references. Files are not embedded or copied.
           </p>
         </div>
@@ -73,12 +73,12 @@ export function ReportView({ projectId }: ReportViewProps) {
           </Button>
         </div>
       </div>
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="pd-panel p-4">
         <textarea
           aria-label="Markdown report"
           readOnly
           value={markdown}
-          className="h-[60vh] w-full resize-none rounded-md border border-slate-200 bg-slate-50 p-4 font-mono text-sm leading-6 text-slate-800"
+          className="pd-input h-[60vh] w-full resize-none p-4 font-mono text-sm leading-6"
         />
       </div>
     </section>

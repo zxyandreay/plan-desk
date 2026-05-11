@@ -69,8 +69,8 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">Files / Resources</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="text-lg font-semibold text-[color:var(--pd-foreground-strong)]">Files / Resources</h3>
+          <p className="text-sm text-[color:var(--pd-muted-foreground)]">
             Link files and folders without moving, scanning, or modifying them.
           </p>
         </div>
@@ -87,23 +87,23 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="pd-toolbar p-4">
         <div className="grid gap-3 md:grid-cols-5">
           <div className="relative md:col-span-2">
-            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[color:var(--pd-subtle-foreground)]" />
             <input
               aria-label="Search resources"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search labels, paths, tags"
-              className="h-9 w-full rounded-md border border-slate-300 pl-9 pr-3 text-sm"
+              className="pd-input h-9 w-full pl-9 pr-3 text-sm"
             />
           </div>
           <select
             aria-label="Filter resource type"
             value={typeFilter}
             onChange={(event) => setTypeFilter(event.target.value as 'all' | ResourceType)}
-            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+            className="pd-input h-9 px-3 text-sm"
           >
             <option value="all">All types</option>
             <option value="file">{resourceTypeLabels.file}</option>
@@ -113,7 +113,7 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
             aria-label="Filter linked section"
             value={entityFilter}
             onChange={(event) => setEntityFilter(event.target.value as 'all' | LinkedEntityType)}
-            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+            className="pd-input h-9 px-3 text-sm"
           >
             <option value="all">All sections</option>
             {linkedEntityTypes.map((type) => (
@@ -128,7 +128,7 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
             onChange={(event) =>
               setHealthFilter(event.target.value as 'all' | 'missing' | 'available' | 'unknown')
             }
-            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+            className="pd-input h-9 px-3 text-sm"
           >
             <option value="all">All health</option>
             <option value="missing">Missing</option>
@@ -142,7 +142,7 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
               aria-label="Filter resource tag"
               value={tagFilter}
               onChange={(event) => setTagFilter(event.target.value)}
-              className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+              className="pd-input h-9 px-3 text-sm"
             >
               <option value="">All tags</option>
               {allTags.map((tag) => (

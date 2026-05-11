@@ -55,12 +55,12 @@ export function Dashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-6 py-6">
-      <header className="flex flex-wrap items-start justify-between gap-4">
+    <div className="pd-page space-y-6">
+      <header className="pd-page-header">
         <div>
-          <p className="text-sm font-medium text-blue-700">Plan projects. Track tasks. Finish work.</p>
-          <h2 className="mt-1 text-3xl font-semibold tracking-normal text-slate-950">Dashboard</h2>
-          <p className="mt-2 max-w-2xl text-sm text-slate-500">
+          <p className="pd-eyebrow">Plan projects. Track tasks. Finish work.</p>
+          <h2 className="pd-page-title">Dashboard</h2>
+          <p className="pd-page-description">
             Your projects, tasks, notes, and files in one local workspace.
           </p>
         </div>
@@ -100,17 +100,17 @@ export function Dashboard() {
       ) : (
         <>
           <section className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
+            <div className="pd-panel">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-base font-semibold text-slate-950">Projects</h3>
+                <h3 className="pd-section-title">Projects</h3>
                 <div className="flex gap-2">
                   <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                    <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[color:var(--pd-subtle-foreground)]" />
                     <input
                       aria-label="Search dashboard projects"
                       value={query}
                       onChange={(event) => setQuery(event.target.value)}
-                      className="h-9 w-64 rounded-md border border-slate-300 pl-9 pr-3 text-sm"
+                      className="pd-input h-9 w-64 pl-9 pr-3 text-sm"
                       placeholder="Search"
                     />
                   </div>
@@ -118,7 +118,7 @@ export function Dashboard() {
                     aria-label="Filter projects by status"
                     value={statusFilter}
                     onChange={(event) => setStatusFilter(event.target.value)}
-                    className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm"
+                    className="pd-input h-9 px-3 text-sm"
                   >
                     <option value="all">All statuses</option>
                     <option value="planning">Planning</option>
@@ -141,12 +141,16 @@ export function Dashboard() {
                         key={project.id}
                         type="button"
                         onClick={() => setActiveProject(project.id)}
-                        className="rounded-lg border border-slate-200 bg-white p-4 text-left transition hover:border-blue-300 hover:bg-blue-50/40"
+                        className="pd-card pd-card-interactive p-4 text-left"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <h4 className="text-base font-semibold text-slate-950">{project.name}</h4>
-                            <p className="mt-1 text-sm text-slate-500">{project.category || 'Uncategorized'}</p>
+                            <h4 className="text-base font-semibold text-[color:var(--pd-foreground-strong)]">
+                              {project.name}
+                            </h4>
+                            <p className="mt-1 text-sm text-[color:var(--pd-muted-foreground)]">
+                              {project.category || 'Uncategorized'}
+                            </p>
                           </div>
                           {project.rootFolderPath ? <FolderOpen className="h-4 w-4 text-blue-700" /> : null}
                         </div>
@@ -159,12 +163,14 @@ export function Dashboard() {
                         <div className="mt-4">
                           <ProgressBar value={progress} label={`${progress}% complete`} />
                         </div>
-                        <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-slate-500">
+                        <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-[color:var(--pd-muted-foreground)]">
                           <span>{countOpenTasks(tasks)} open tasks</span>
                           <span>{countOpenIssues(issues)} open issues</span>
                           <span>{resources.length} resources</span>
                         </div>
-                        <p className="mt-3 text-xs text-slate-500">Due {formatDate(project.dueDate)}</p>
+                        <p className="mt-3 text-xs text-[color:var(--pd-muted-foreground)]">
+                          Due {formatDate(project.dueDate)}
+                        </p>
                       </button>
                     )
                   })}
@@ -184,10 +190,12 @@ export function Dashboard() {
                           key={task.id}
                           type="button"
                           onClick={() => setActiveProject(task.projectId)}
-                          className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-left hover:bg-blue-50"
+                          className="pd-row w-full px-3 py-2 text-left"
                         >
-                          <div className="text-sm font-medium text-slate-900">{task.title}</div>
-                          <div className="mt-1 text-xs text-slate-500">
+                          <div className="text-sm font-medium text-[color:var(--pd-foreground-strong)]">
+                            {task.title}
+                          </div>
+                          <div className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">
                             {project?.name ?? 'Project'} · {formatDate(task.dueDate)}
                           </div>
                         </button>
@@ -195,7 +203,9 @@ export function Dashboard() {
                     })}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">Nothing due in the next seven days.</p>
+                  <p className="text-sm text-[color:var(--pd-muted-foreground)]">
+                    Nothing due in the next seven days.
+                  </p>
                 )}
               </Panel>
               <Panel title="Recent projects">
@@ -205,10 +215,12 @@ export function Dashboard() {
                       key={project.id}
                       type="button"
                       onClick={() => setActiveProject(project.id)}
-                      className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm hover:bg-slate-100"
+                      className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm hover:bg-[color:var(--pd-muted)]"
                     >
-                      <span className="font-medium text-slate-800">{project.name}</span>
-                      <span className="text-xs text-slate-500">{formatDate(project.updatedAt)}</span>
+                      <span className="font-medium text-[color:var(--pd-foreground)]">{project.name}</span>
+                      <span className="text-xs text-[color:var(--pd-muted-foreground)]">
+                        {formatDate(project.updatedAt)}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -227,20 +239,20 @@ export function Dashboard() {
 
 function StatCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <div className="flex items-center justify-between text-slate-500">
+    <div className="pd-card p-4">
+      <div className="flex items-center justify-between text-[color:var(--pd-muted-foreground)]">
         <span className="text-sm">{label}</span>
         {icon}
       </div>
-      <div className="mt-3 text-2xl font-semibold text-slate-950">{value}</div>
+      <div className="mt-3 text-2xl font-semibold text-[color:var(--pd-foreground-strong)]">{value}</div>
     </div>
   )
 }
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <h3 className="mb-3 text-base font-semibold text-slate-950">{title}</h3>
+    <div className="pd-panel">
+      <h3 className="mb-3 pd-section-title">{title}</h3>
       {children}
     </div>
   )

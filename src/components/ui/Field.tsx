@@ -9,9 +9,9 @@ interface FieldShellProps {
 function FieldShell({ label, children, hint }: FieldShellProps) {
   return (
     <label className="block space-y-1.5 text-sm">
-      <span className="font-medium text-slate-700">{label}</span>
+      <span className="font-medium text-[color:var(--pd-foreground)]">{label}</span>
       {children}
-      {hint ? <span className="block text-xs text-slate-500">{hint}</span> : null}
+      {hint ? <span className="block text-xs text-[color:var(--pd-muted-foreground)]">{hint}</span> : null}
     </label>
   )
 }
@@ -24,7 +24,7 @@ export function TextField({
   return (
     <FieldShell label={label} hint={hint}>
       <input
-        className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm placeholder:text-slate-400"
+        className="pd-input h-10 w-full px-3 text-sm"
         {...props}
       />
     </FieldShell>
@@ -39,7 +39,7 @@ export function TextAreaField({
   return (
     <FieldShell label={label} hint={hint}>
       <textarea
-        className="min-h-24 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm placeholder:text-slate-400"
+        className="pd-input min-h-24 w-full px-3 py-2 text-sm"
         {...props}
       />
     </FieldShell>
@@ -55,7 +55,7 @@ export function SelectField({
   return (
     <FieldShell label={label} hint={hint}>
       <select
-        className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm"
+        className="pd-input h-10 w-full px-3 text-sm"
         {...props}
       >
         {children}

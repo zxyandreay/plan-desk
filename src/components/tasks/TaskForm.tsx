@@ -131,7 +131,7 @@ export function TaskForm({ task, milestones, onCancel, onSubmit }: TaskFormProps
           hint="Separate tags with commas."
         />
       </div>
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div className="pd-muted-panel p-4">
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <TextField
@@ -150,9 +150,9 @@ export function TaskForm({ task, milestones, onCancel, onSubmit }: TaskFormProps
             {values.subtasks.map((subtask) => (
               <div
                 key={subtask.id}
-                className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-white px-3 py-2"
+                className="pd-row flex items-center justify-between gap-2 px-3 py-2"
               >
-                <label className="flex items-center gap-2 text-sm text-slate-700">
+                <label className="flex items-center gap-2 text-sm text-[color:var(--pd-foreground)]">
                   <input
                     type="checkbox"
                     checked={subtask.completed}
