@@ -4,6 +4,7 @@ $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $releaseDir = Join-Path $repoRoot "release"
 $targetDir = Join-Path $repoRoot "src-tauri\target\release"
 $nsisDir = Join-Path $targetDir "bundle\nsis"
+$packageJsonPath = Join-Path $repoRoot "package.json"
 
 function Write-Step {
   param([string]$Message)
@@ -56,6 +57,11 @@ function Get-VsDevCmd {
 Set-Location $repoRoot
 Refresh-Path
 
+$appVersion = (Get-Content -LiteralPath $packageJsonPath -Raw | ConvertFrom-Json).version
+if (-not $appVersion) {
+  throw "Could not read app version from package.json"
+}
+
 Write-Step "Checking required commands"
 if (-not (Test-Command "npm.cmd")) {
   throw "npm.cmd was not found. Install Node.js first."
@@ -104,7 +110,7 @@ if (-not $installer) {
   throw "Tauri build finished, but no NSIS installer .exe was found in $nsisDir"
 }
 
-$installerTarget = Join-Path $releaseDir "PlanDesk_0.1.0_x64-setup.exe"
+$installerTarget = Join-Path $releaseDir "PlanDesk_${appVersion}_x64-setup.exe"
 Copy-Item -LiteralPath $installer.FullName -Destination $installerTarget -Force
 
 $appExe = Join-Path $targetDir "plandesk.exe"

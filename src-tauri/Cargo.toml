@@ -1,6 +1,6 @@
 [package]
 name = "plandesk"
-version = "0.1.0"
+version = "1.0.1"
 description = "PlanDesk local-first desktop project manager"
 authors = ["PlanDesk"]
 license = "MIT"

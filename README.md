@@ -109,11 +109,11 @@ The build script runs install, typecheck, lint, and Tauri's NSIS build. It copie
 
 ```text
 release/
-  PlanDesk_0.1.0_x64-setup.exe
+  PlanDesk_1.0.1_x64-setup.exe
   PlanDesk.exe
 ```
 
-Use `PlanDesk_0.1.0_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk.exe` when you want to launch the built app directly from the release folder.
+Use `PlanDesk_1.0.1_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk.exe` when you want to launch the built app directly from the release folder.
 
 Tauri uses Microsoft WebView2 internally to render the app window, but PlanDesk opens like a normal desktop app. No browser tab or Vite dev server is needed after building.
 
@@ -187,12 +187,15 @@ src-tauri/
 ## Future Improvements
 
 - SQLite storage backend for packaged desktop builds.
-- Dark mode styling tied to the stored theme setting.
 - Activity history.
 - Project templates.
 - PDF export.
 - Optional shallow folder preview for direct child counts.
 - Keyboard shortcuts for common creation and navigation actions.
+
+## Versioning
+
+PlanDesk treats meaningful fixes, additions, packaging updates, and production polish as release changes. Future updates should include an appropriate version bump across npm, Tauri, Cargo, visible app text, release filenames, and `CHANGELOG.md`.
 
 ## License
 

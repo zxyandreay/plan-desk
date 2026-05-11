@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { validateImportedData } from '../../data/localRepository'
 import { downloadTextFile } from '../../lib/report'
 import { useAppStore } from '../../stores/appStore'
+import { APP_VERSION } from '../../utils/version'
 import { Button } from '../ui/Button'
 import { ConfirmDialog } from '../ui/ConfirmDialog'
 import { SelectField } from '../ui/Field'
@@ -36,7 +37,7 @@ export function SettingsView() {
       const text = await file.text()
       const parsed = validateImportedData(JSON.parse(text))
       const confirmed = window.confirm(
-        'Importing this backup will replace the current PlanDesk data in this browser profile. Continue?',
+        'Importing this backup will replace the current PlanDesk local app data. Continue?',
       )
       if (!confirmed) {
         return
@@ -141,7 +142,7 @@ export function SettingsView() {
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <h3 className="text-base font-semibold text-slate-950">About</h3>
         <p className="mt-2 text-sm text-slate-600">
-          PlanDesk 0.1.0 · Local-first project workspace for individuals and small teams.
+          PlanDesk {APP_VERSION} - Local-first project workspace for individuals and small teams.
         </p>
       </section>
 

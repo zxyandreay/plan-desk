@@ -6,6 +6,7 @@ import { AppShell } from './components/layout/AppShell'
 import { ProjectWorkspace } from './components/projects/ProjectWorkspace'
 import { SettingsView } from './components/settings/SettingsView'
 import { Toast } from './components/ui/Toast'
+import { useTheme } from './hooks/useTheme'
 import { useAppStore } from './stores/appStore'
 
 function App() {
@@ -13,6 +14,9 @@ function App() {
   const isReady = useAppStore((state) => state.isReady)
   const activeView = useAppStore((state) => state.activeView)
   const activeProjectId = useAppStore((state) => state.activeProjectId)
+  const theme = useAppStore((state) => state.data.settings.theme)
+
+  useTheme(theme)
 
   useEffect(() => {
     void initialize()
