@@ -2,6 +2,11 @@
 
 All meaningful fixes, additions, and release packaging changes should include an appropriate version bump across `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and visible app/version docs.
 
+## 1.1.1 - 2026-05-11
+
+- Updated the Windows app and installer icon to use the PlanDesk sidebar brand mark.
+- Added the matching PlanDesk favicon for the Vite preview.
+
 ## 1.1.0 - 2026-05-11
 
 - Refined the production UI system with semantic design tokens, calmer surfaces, and cohesive desktop spacing.

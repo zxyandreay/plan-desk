@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "PlanDesk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "identifier": "com.plandesk.desktop",
   "build": {
     "frontendDist": "../dist",
@@ -42,6 +42,8 @@
       },
       "nsis": {
         "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
         "startMenuFolder": "PlanDesk"
       }
     },
