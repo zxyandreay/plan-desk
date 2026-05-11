@@ -32,6 +32,11 @@ export function ReportView({ projectId }: ReportViewProps) {
     showToast(result.message, result.ok ? 'success' : 'error')
   }
 
+  const exportFile = async (filename: string, content: string, type: string) => {
+    const result = await downloadTextFile(filename, content, type)
+    showToast(result.message, result.ok ? 'success' : 'error')
+  }
+
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -47,14 +52,16 @@ export function ReportView({ projectId }: ReportViewProps) {
           </Button>
           <Button
             icon={<Download className="h-4 w-4" />}
-            onClick={() => downloadTextFile(`${safeName || 'project'}-report.md`, markdown, 'text/markdown')}
+            onClick={() =>
+              void exportFile(`${safeName || 'project'}-report.md`, markdown, 'text/markdown')
+            }
           >
             Download .md
           </Button>
           <Button
             icon={<Table className="h-4 w-4" />}
             onClick={() =>
-              downloadTextFile(`${safeName || 'project'}-tasks.csv`, generateTaskCsv(tasks), 'text/csv')
+              void exportFile(`${safeName || 'project'}-tasks.csv`, generateTaskCsv(tasks), 'text/csv')
             }
           >
             CSV tasks
@@ -62,7 +69,7 @@ export function ReportView({ projectId }: ReportViewProps) {
           <Button
             icon={<FileJson className="h-4 w-4" />}
             onClick={() =>
-              downloadTextFile(
+              void exportFile(
                 'plandesk-backup.json',
                 JSON.stringify(exportData(), null, 2),
                 'application/json',

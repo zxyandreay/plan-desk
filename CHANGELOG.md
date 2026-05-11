@@ -2,6 +2,13 @@
 
 All meaningful fixes, additions, and release packaging changes should include an appropriate version bump across `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and visible app/version docs.
 
+## 1.1.3 - 2026-05-11
+
+- Fixed report exports in the desktop app by using native Save dialogs and a focused Tauri file-write command.
+- Fixed Markdown, CSV task, and JSON backup export actions from the Report view.
+- Fixed JSON backup export from Settings and added export success/error feedback.
+- Improved clipboard copy fallback for Markdown reports.
+
 ## 1.1.2 - 2026-05-11
 
 - Rebuilt Windows release outputs with `PlanDesk` as the main binary name.

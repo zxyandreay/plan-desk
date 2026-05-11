@@ -10,6 +10,7 @@ import {
 } from '../types/constants'
 import type { AppData, Project, Task } from '../types/models'
 import { formatDate } from '../utils/date'
+import { isTauriRuntime } from './fileSystem'
 import {
   calculateMilestoneProgress,
   calculateProgress,
@@ -107,12 +108,69 @@ export function generateTaskCsv(tasks: Task[]) {
     .join('\n')
 }
 
-export function downloadTextFile(filename: string, content: string, type = 'text/plain') {
+export type ExportFileResult = {
+  ok: boolean
+  message: string
+}
+
+const extensionFilters: Record<string, { name: string; extensions: string[] }> = {
+  md: { name: 'Markdown', extensions: ['md'] },
+  markdown: { name: 'Markdown', extensions: ['md', 'markdown'] },
+  csv: { name: 'CSV', extensions: ['csv'] },
+  json: { name: 'JSON', extensions: ['json'] },
+  txt: { name: 'Text', extensions: ['txt'] },
+}
+
+function extensionForFilename(filename: string) {
+  return filename.split('.').pop()?.toLowerCase() || 'txt'
+}
+
+function browserDownloadTextFile(filename: string, content: string, type: string) {
   const blob = new Blob([content], { type })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
   anchor.download = filename
+  anchor.style.display = 'none'
+  document.body.appendChild(anchor)
   anchor.click()
-  URL.revokeObjectURL(url)
+  anchor.remove()
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+export async function downloadTextFile(
+  filename: string,
+  content: string,
+  type = 'text/plain',
+): Promise<ExportFileResult> {
+  try {
+    if (isTauriRuntime()) {
+      const [{ save }, { invoke }] = await Promise.all([
+        import('@tauri-apps/plugin-dialog'),
+        import('@tauri-apps/api/core'),
+      ])
+      const extension = extensionForFilename(filename)
+      const filter = extensionFilters[extension] ?? extensionFilters.txt
+      const path = await save({
+        title: `Save ${filename}`,
+        defaultPath: filename,
+        filters: [filter],
+      })
+
+      if (!path) {
+        return { ok: false, message: 'Export cancelled.' }
+      }
+
+      await invoke('save_text_file', { path, contents: content })
+      return { ok: true, message: `Saved ${filename}.` }
+    }
+
+    browserDownloadTextFile(filename, content, type)
+    return { ok: true, message: `Downloaded ${filename}.` }
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : `Could not save ${filename}.`,
+    }
+  }
 }

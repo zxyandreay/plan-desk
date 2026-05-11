@@ -5,7 +5,7 @@ type ActionResult = {
   message: string
 }
 
-function isTauriRuntime() {
+export function isTauriRuntime() {
   return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 }
 
@@ -52,13 +52,37 @@ export async function copyText(text: string): Promise<ActionResult> {
       await writeText(text)
       return { ok: true, message: 'Copied to clipboard.' }
     }
+  } catch {
+    // Fall through to browser/DOM clipboard fallbacks.
+  }
 
+  try {
     await navigator.clipboard.writeText(text)
     return { ok: true, message: 'Copied to clipboard.' }
-  } catch (error) {
+  } catch {
+    try {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      textArea.setAttribute('readonly', '')
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-9999px'
+      textArea.style.top = '0'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      const copied = document.execCommand('copy')
+      document.body.removeChild(textArea)
+
+      if (copied) {
+        return { ok: true, message: 'Copied to clipboard.' }
+      }
+    } catch {
+      // Return a stable, user-facing error below.
+    }
+
     return {
       ok: false,
-      message: error instanceof Error ? error.message : 'Could not copy path.',
+      message: 'Could not copy to clipboard.',
     }
   }
 }

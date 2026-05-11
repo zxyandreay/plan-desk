@@ -20,12 +20,13 @@ export function SettingsView() {
   const [isClearOpen, setClearOpen] = useState(false)
   const [isSampleOpen, setSampleOpen] = useState(false)
 
-  const exportBackup = () => {
-    downloadTextFile(
+  const exportBackup = async () => {
+    const result = await downloadTextFile(
       'plandesk-backup.json',
       JSON.stringify(exportData(), null, 2),
       'application/json',
     )
+    showToast(result.message, result.ok ? 'success' : 'error')
   }
 
   const importBackup = async (file: File | undefined) => {
@@ -118,7 +119,7 @@ export function SettingsView() {
           and local paths as plain text references. They do not copy the actual files or folders.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Button icon={<Download className="h-4 w-4" />} onClick={exportBackup}>
+          <Button icon={<Download className="h-4 w-4" />} onClick={() => void exportBackup()}>
             Export JSON backup
           </Button>
           <Button icon={<Upload className="h-4 w-4" />} onClick={() => fileInputRef.current?.click()}>
