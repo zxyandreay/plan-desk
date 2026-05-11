@@ -23,6 +23,32 @@ function Refresh-Path {
   $env:Path = "$machinePath;$userPath"
 }
 
+function Refresh-ShellIconCache {
+  try {
+    $ie4uinit = Join-Path $env:SystemRoot "System32\ie4uinit.exe"
+    if (Test-Path $ie4uinit) {
+      & $ie4uinit -show | Out-Null
+    }
+  } catch {
+    Write-Warning "Could not run ie4uinit icon refresh: $($_.Exception.Message)"
+  }
+
+  try {
+    Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+
+public static class PlanDeskShellNotify {
+  [DllImport("shell32.dll")]
+  public static extern void SHChangeNotify(int wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+}
+"@ -ErrorAction SilentlyContinue
+    [PlanDeskShellNotify]::SHChangeNotify(0x08000000, 0, [IntPtr]::Zero, [IntPtr]::Zero)
+  } catch {
+    Write-Warning "Could not notify Windows shell about refreshed icons: $($_.Exception.Message)"
+  }
+}
+
 function Invoke-Checked {
   param(
     [string]$FilePath,
@@ -113,10 +139,19 @@ if (-not $installer) {
 $installerTarget = Join-Path $releaseDir "PlanDesk_${appVersion}_x64-setup.exe"
 Copy-Item -LiteralPath $installer.FullName -Destination $installerTarget -Force
 
-$appExe = Join-Path $targetDir "plandesk.exe"
-if (Test-Path $appExe) {
+$appExe = @(
+  (Join-Path $targetDir "PlanDesk.exe"),
+  (Join-Path $targetDir "plandesk.exe")
+) | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if ($appExe) {
   Copy-Item -LiteralPath $appExe -Destination (Join-Path $releaseDir "PlanDesk.exe") -Force
+  Copy-Item -LiteralPath $appExe -Destination (Join-Path $releaseDir "PlanDesk_${appVersion}_x64.exe") -Force
+} else {
+  Write-Warning "Direct PlanDesk executable was not found in $targetDir"
 }
+
+Refresh-ShellIconCache
 
 Write-Step "Release ready"
 Get-ChildItem -Path $releaseDir -File | Select-Object Name, Length, FullName | Format-Table -AutoSize

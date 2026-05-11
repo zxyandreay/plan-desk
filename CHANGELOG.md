@@ -2,6 +2,12 @@
 
 All meaningful fixes, additions, and release packaging changes should include an appropriate version bump across `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and visible app/version docs.
 
+## 1.1.2 - 2026-05-11
+
+- Rebuilt Windows release outputs with `PlanDesk` as the main binary name.
+- Added a versioned direct EXE release artifact to avoid stale Windows Explorer icon cache entries.
+- Refreshed the Windows shell icon cache at the end of the local release build script.
+
 ## 1.1.1 - 2026-05-11
 
 - Updated the Windows app and installer icon to use the PlanDesk sidebar brand mark.
