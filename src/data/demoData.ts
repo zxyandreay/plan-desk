@@ -1,0 +1,281 @@
+import type { AppData } from '../types/models'
+import { nowIso, todayIso } from '../utils/date'
+
+function dateOffset(days: number) {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
+export function createSampleData(): AppData {
+  const createdAt = nowIso()
+  const projects = [
+    {
+      id: 'demo_project_website',
+      name: 'Client Website Redesign',
+      description: 'A calm redesign project for a small client site with content, design, and launch work.',
+      category: 'Freelance',
+      goal: 'Launch a refreshed website with approved brand assets and a clean handoff package.',
+      status: 'active' as const,
+      priority: 'high' as const,
+      startDate: todayIso(),
+      dueDate: dateOffset(30),
+      rootFolderPath: 'Demo path: C:\\PlanDesk Examples\\Client Website Redesign',
+      rootFolderStatus: 'missing' as const,
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_project_graduation',
+      name: 'Graduation Event Planning',
+      description: 'A practical plan for venue, suppliers, guests, and final preparation.',
+      category: 'Event',
+      goal: 'Coordinate the event plan and keep suppliers, invitations, and final prep visible.',
+      status: 'planning' as const,
+      priority: 'medium' as const,
+      startDate: todayIso(),
+      dueDate: dateOffset(60),
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_project_research',
+      name: 'Research Paper',
+      description: 'A structured writing project with source gathering, drafting, and revision.',
+      category: 'Study',
+      goal: 'Submit a polished paper with organized source notes and a clean final draft.',
+      status: 'active' as const,
+      priority: 'medium' as const,
+      startDate: todayIso(),
+      dueDate: dateOffset(21),
+      createdAt,
+      updatedAt: createdAt,
+    },
+  ]
+
+  const milestoneSeeds = [
+    {
+      id: 'demo_milestone_discovery',
+      projectId: 'demo_project_website',
+      title: 'Discovery',
+      description: 'Collect requirements and content.',
+      status: 'completed' as const,
+      offset: -1,
+    },
+    {
+      id: 'demo_milestone_design',
+      projectId: 'demo_project_website',
+      title: 'Design',
+      description: 'Prepare design direction and mockups.',
+      status: 'in_progress' as const,
+      offset: 7,
+    },
+    {
+      id: 'demo_milestone_development',
+      projectId: 'demo_project_website',
+      title: 'Development',
+      description: 'Build and QA the refreshed site.',
+      status: 'not_started' as const,
+      offset: 21,
+    },
+    {
+      id: 'demo_milestone_venue',
+      projectId: 'demo_project_graduation',
+      title: 'Venue',
+      description: 'Confirm space, schedule, and logistics.',
+      status: 'in_progress' as const,
+      offset: 10,
+    },
+    {
+      id: 'demo_milestone_sources',
+      projectId: 'demo_project_research',
+      title: 'Source Gathering',
+      description: 'Collect and annotate references.',
+      status: 'in_progress' as const,
+      offset: 5,
+    },
+    {
+      id: 'demo_milestone_drafting',
+      projectId: 'demo_project_research',
+      title: 'Drafting',
+      description: 'Draft the main argument and sections.',
+      status: 'not_started' as const,
+      offset: 14,
+    },
+  ]
+
+  const milestones = milestoneSeeds.map((seed, order) => ({
+    id: seed.id,
+    projectId: seed.projectId,
+    title: seed.title,
+    description: seed.description,
+    status: seed.status,
+    dueDate: dateOffset(seed.offset),
+    order,
+    createdAt,
+    updatedAt: createdAt,
+  }))
+
+  const tasks = [
+    {
+      id: 'demo_task_homepage',
+      projectId: 'demo_project_website',
+      milestoneId: 'demo_milestone_design',
+      title: 'Finalize homepage mockup',
+      description: 'Review hero, service sections, and responsive states before client approval.',
+      status: 'review' as const,
+      priority: 'high' as const,
+      dueDate: dateOffset(2),
+      assignee: 'Andrea',
+      tags: ['design', 'client'],
+      subtasks: [
+        { id: 'demo_subtask_1', title: 'Check mobile layout', completed: true },
+        { id: 'demo_subtask_2', title: 'Export preview images', completed: false },
+      ],
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_task_assets',
+      projectId: 'demo_project_website',
+      milestoneId: 'demo_milestone_design',
+      title: 'Request final logo files',
+      description: 'Ask client for SVG and high-resolution logo package.',
+      status: 'blocked' as const,
+      priority: 'urgent' as const,
+      dueDate: dateOffset(-2),
+      assignee: 'Andrea',
+      tags: ['assets'],
+      subtasks: [],
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_task_guest_list',
+      projectId: 'demo_project_graduation',
+      milestoneId: 'demo_milestone_venue',
+      title: 'Confirm guest list count',
+      description: 'Lock the guest estimate for venue and supplier quotes.',
+      status: 'todo' as const,
+      priority: 'medium' as const,
+      dueDate: dateOffset(6),
+      tags: ['planning'],
+      subtasks: [],
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_task_sources',
+      projectId: 'demo_project_research',
+      milestoneId: 'demo_milestone_sources',
+      title: 'Annotate five primary sources',
+      description: 'Summarize useful quotes and relevance for the argument.',
+      status: 'in_progress' as const,
+      priority: 'high' as const,
+      dueDate: dateOffset(4),
+      tags: ['research'],
+      subtasks: [
+        { id: 'demo_subtask_3', title: 'Export citation list', completed: false },
+      ],
+      createdAt,
+      updatedAt: createdAt,
+    },
+  ]
+
+  const issues = [
+    {
+      id: 'demo_issue_logo',
+      projectId: 'demo_project_website',
+      relatedTaskId: 'demo_task_assets',
+      title: 'Client has not sent final logo',
+      description: 'Launch artwork cannot be finalized without production logo files.',
+      severity: 'high' as const,
+      status: 'open' as const,
+      resolutionNotes: '',
+      createdAt,
+      updatedAt: createdAt,
+    },
+  ]
+
+  const notes = [
+    {
+      id: 'demo_note_kickoff',
+      projectId: 'demo_project_website',
+      title: 'Kickoff decisions',
+      content: 'Client prefers a clean, practical site with fewer pages and clearer calls to action.',
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_note_sources',
+      projectId: 'demo_project_research',
+      title: 'Working thesis',
+      content: 'Keep the argument focused and use source notes to support each section.',
+      createdAt,
+      updatedAt: createdAt,
+    },
+  ]
+
+  const resources = [
+    {
+      id: 'demo_resource_design',
+      projectId: 'demo_project_website',
+      linkedEntityType: 'milestone' as const,
+      linkedEntityId: 'demo_milestone_design',
+      label: 'Design Files Folder',
+      type: 'folder' as const,
+      path: 'Demo path: C:\\PlanDesk Examples\\Client Website Redesign\\Design Files',
+      description: 'Example folder link for design source files.',
+      tags: ['demo', 'design'],
+      isMissing: true,
+      pathHealth: 'missing' as const,
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_resource_homepage',
+      projectId: 'demo_project_website',
+      linkedEntityType: 'task' as const,
+      linkedEntityId: 'demo_task_homepage',
+      label: 'Homepage mockup export',
+      type: 'file' as const,
+      path: 'Demo path: C:\\PlanDesk Examples\\Client Website Redesign\\Design Files\\homepage-final.png',
+      description: 'Example file link. Replace with a real file when using PlanDesk.',
+      tags: ['demo', 'mockup'],
+      isMissing: true,
+      pathHealth: 'missing' as const,
+      createdAt,
+      updatedAt: createdAt,
+    },
+    {
+      id: 'demo_resource_guest_list',
+      projectId: 'demo_project_graduation',
+      linkedEntityType: 'task' as const,
+      linkedEntityId: 'demo_task_guest_list',
+      label: 'Guest List Spreadsheet',
+      type: 'file' as const,
+      path: 'Demo path: C:\\PlanDesk Examples\\Graduation Event\\guest-list.xlsx',
+      description: 'Example spreadsheet path for event planning.',
+      tags: ['demo', 'spreadsheet'],
+      isMissing: true,
+      pathHealth: 'missing' as const,
+      createdAt,
+      updatedAt: createdAt,
+    },
+  ]
+
+  return {
+    version: 1,
+    projects,
+    milestones,
+    tasks,
+    issues,
+    notes,
+    resources,
+    settings: {
+      theme: 'system',
+      defaultView: 'dashboard',
+      lastOpenedProjectId: 'demo_project_website',
+    },
+  }
+}

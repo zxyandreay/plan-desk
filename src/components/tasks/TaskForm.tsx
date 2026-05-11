@@ -1,0 +1,196 @@
+import { Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { taskPriorities, taskPriorityLabels, taskStatuses, taskStatusLabels } from '../../types/constants'
+import type { Milestone, Subtask, Task, TaskFormValues } from '../../types/models'
+import { createId } from '../../utils/id'
+import { joinTags, splitTags } from '../../utils/text'
+import { Button } from '../ui/Button'
+import { SelectField, TextAreaField, TextField } from '../ui/Field'
+
+interface TaskFormProps {
+  task?: Task
+  milestones: Milestone[]
+  onCancel: () => void
+  onSubmit: (values: TaskFormValues) => void
+}
+
+export function TaskForm({ task, milestones, onCancel, onSubmit }: TaskFormProps) {
+  const [values, setValues] = useState<TaskFormValues>({
+    title: task?.title ?? '',
+    description: task?.description ?? '',
+    status: task?.status ?? 'todo',
+    priority: task?.priority ?? 'medium',
+    dueDate: task?.dueDate ?? '',
+    milestoneId: task?.milestoneId,
+    assignee: task?.assignee ?? '',
+    tags: task?.tags ?? [],
+    subtasks: task?.subtasks ?? [],
+  })
+  const [tagText, setTagText] = useState(joinTags(values.tags))
+  const [subtaskTitle, setSubtaskTitle] = useState('')
+  const [error, setError] = useState('')
+
+  const updateValue = <K extends keyof TaskFormValues>(key: K, value: TaskFormValues[K]) => {
+    setValues((current) => ({ ...current, [key]: value }))
+  }
+
+  const addSubtask = () => {
+    if (!subtaskTitle.trim()) {
+      return
+    }
+
+    const subtask: Subtask = {
+      id: createId('subtask'),
+      title: subtaskTitle.trim(),
+      completed: false,
+    }
+    updateValue('subtasks', [...values.subtasks, subtask])
+    setSubtaskTitle('')
+  }
+
+  const submit = () => {
+    if (!values.title.trim()) {
+      setError('Task title is required.')
+      return
+    }
+
+    onSubmit({
+      ...values,
+      title: values.title.trim(),
+      assignee: values.assignee?.trim() || undefined,
+      milestoneId: values.milestoneId || undefined,
+      tags: splitTags(tagText),
+    })
+  }
+
+  return (
+    <div className="space-y-4">
+      <TextField
+        label="Title"
+        value={values.title}
+        onChange={(event) => updateValue('title', event.target.value)}
+        placeholder="Finalize homepage mockup"
+      />
+      <TextAreaField
+        label="Description"
+        value={values.description}
+        onChange={(event) => updateValue('description', event.target.value)}
+      />
+      <div className="grid gap-4 md:grid-cols-2">
+        <SelectField
+          label="Status"
+          value={values.status}
+          onChange={(event) => updateValue('status', event.target.value as TaskFormValues['status'])}
+        >
+          {taskStatuses.map((status) => (
+            <option key={status} value={status}>
+              {taskStatusLabels[status]}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
+          label="Priority"
+          value={values.priority}
+          onChange={(event) => updateValue('priority', event.target.value as TaskFormValues['priority'])}
+        >
+          {taskPriorities.map((priority) => (
+            <option key={priority} value={priority}>
+              {taskPriorityLabels[priority]}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
+          label="Milestone"
+          value={values.milestoneId ?? ''}
+          onChange={(event) => updateValue('milestoneId', event.target.value || undefined)}
+        >
+          <option value="">No milestone</option>
+          {milestones.map((milestone) => (
+            <option key={milestone.id} value={milestone.id}>
+              {milestone.title}
+            </option>
+          ))}
+        </SelectField>
+        <TextField
+          label="Due date"
+          type="date"
+          value={values.dueDate}
+          onChange={(event) => updateValue('dueDate', event.target.value)}
+        />
+        <TextField
+          label="Assignee"
+          value={values.assignee ?? ''}
+          onChange={(event) => updateValue('assignee', event.target.value)}
+          placeholder="Optional"
+        />
+        <TextField
+          label="Tags"
+          value={tagText}
+          onChange={(event) => setTagText(event.target.value)}
+          placeholder="design, client"
+          hint="Separate tags with commas."
+        />
+      </div>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <TextField
+              label="Add subtask"
+              value={subtaskTitle}
+              onChange={(event) => setSubtaskTitle(event.target.value)}
+              placeholder="Check mobile layout"
+            />
+          </div>
+          <Button icon={<Plus className="h-4 w-4" />} onClick={addSubtask}>
+            Add
+          </Button>
+        </div>
+        {values.subtasks.length ? (
+          <div className="mt-3 space-y-2">
+            {values.subtasks.map((subtask) => (
+              <div
+                key={subtask.id}
+                className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-white px-3 py-2"
+              >
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={subtask.completed}
+                    onChange={() =>
+                      updateValue(
+                        'subtasks',
+                        values.subtasks.map((item) =>
+                          item.id === subtask.id ? { ...item, completed: !item.completed } : item,
+                        ),
+                      )
+                    }
+                  />
+                  {subtask.title}
+                </label>
+                <Button
+                  aria-label={`Remove ${subtask.title}`}
+                  variant="ghost"
+                  size="sm"
+                  icon={<Trash2 className="h-4 w-4" />}
+                  onClick={() =>
+                    updateValue(
+                      'subtasks',
+                      values.subtasks.filter((item) => item.id !== subtask.id),
+                    )
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </div>
+      {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+      <div className="flex justify-end gap-2">
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button variant="primary" onClick={submit}>
+          {task ? 'Save task' : 'Create task'}
+        </Button>
+      </div>
+    </div>
+  )
+}
