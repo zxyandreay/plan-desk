@@ -87,6 +87,36 @@ Build the frontend:
 npm run build
 ```
 
+## Build The Windows App
+
+PlanDesk is configured to build as a native Windows desktop app with a setup `.exe`.
+
+Install the Windows native build prerequisites once:
+
+```powershell
+npm.cmd run desktop:setup
+```
+
+If Rust or Visual Studio Build Tools were just installed, restart PowerShell so `cargo`, `rustc`, and the MSVC tools are available.
+
+Build the Windows app and collect the release files:
+
+```powershell
+npm.cmd run desktop:build
+```
+
+The build script runs install, typecheck, lint, and Tauri's NSIS build. It copies the finished files into:
+
+```text
+release/
+  PlanDesk_0.1.0_x64-setup.exe
+  PlanDesk.exe
+```
+
+Use `PlanDesk_0.1.0_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk.exe` when you want to launch the built app directly from the release folder.
+
+Tauri uses Microsoft WebView2 internally to render the app window, but PlanDesk opens like a normal desktop app. No browser tab or Vite dev server is needed after building.
+
 ## Tauri Development
 
 Tauri source lives in `src-tauri`.
@@ -103,7 +133,7 @@ Build the desktop app:
 npm run tauri:build
 ```
 
-Tauri requires Rust and Cargo. If `cargo` is not available on your PATH, install Rust from https://rustup.rs/ before running Tauri commands.
+Tauri requires Rust, Cargo, Microsoft C++ Build Tools, and WebView2 on Windows. The `desktop:setup` script installs or checks these prerequisites.
 
 ## Data And Storage
 
