@@ -1,6 +1,7 @@
 import { Edit3, File, Folder, Trash2 } from 'lucide-react'
 import { linkedEntityLabels, resourceTypeLabels } from '../../types/constants'
 import type { AppData, ResourceLink } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import { linkedEntityName } from '../../utils/metrics'
 import { compactPath } from '../../utils/text'
@@ -19,13 +20,14 @@ export function ResourceCard({ data, resource, onEdit, onDelete }: ResourceCardP
   const Icon = resource.type === 'folder' ? Folder : File
 
   return (
-    <article className={`pd-card p-4 ${resource.isMissing ? 'pd-danger-row' : ''}`}>
+    <article className={`pd-card pd-color-card p-4 pl-5 ${colorClass(resource.color)} ${resource.isMissing ? 'pd-danger-row' : ''}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-[color:var(--pd-muted)] text-[color:var(--pd-accent-foreground)]">
+            <span className="grid h-9 w-9 place-items-center rounded-lg border border-[color:var(--pd-color-border)] bg-[color:var(--pd-color-soft)] text-[color:var(--pd-color-foreground)]">
               <Icon className="h-5 w-5" />
             </span>
+            <span className="pd-color-dot" aria-hidden="true" />
             <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{resource.label}</h4>
             {resource.isMissing ? <Badge tone="red">Missing</Badge> : null}
             {resource.pathHealth === 'unknown' ? <Badge tone="amber">Unchecked</Badge> : null}

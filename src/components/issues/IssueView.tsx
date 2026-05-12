@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useAppStore } from '../../stores/appStore'
 import { issueSeverityLabels, issueStatusLabels } from '../../types/constants'
 import type { Issue, IssueFormValues, ResourceFormValues } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import { resourceCountForEntity } from '../../utils/metrics'
 import { Badge } from '../ui/Badge'
@@ -74,10 +75,13 @@ export function IssueView({ projectId }: IssueViewProps) {
             const relatedTask = tasks.find((task) => task.id === issue.relatedTaskId)
             const linkedResources = resourceCountForEntity(resources, 'issue', issue.id)
             return (
-              <article key={issue.id} className="pd-card p-4">
+              <article key={issue.id} className={`pd-card pd-color-card p-4 pl-5 ${colorClass(issue.color)}`}>
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{issue.title}</h4>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="pd-color-dot" aria-hidden="true" />
+                      <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{issue.title}</h4>
+                    </div>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pd-muted-foreground)]">
                       {issue.description || 'No description.'}
                     </p>

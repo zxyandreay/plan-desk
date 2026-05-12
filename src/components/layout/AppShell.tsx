@@ -5,6 +5,7 @@ import { cn } from '../../lib/cn'
 import { useAppStore, type AppView } from '../../stores/appStore'
 import { projectStatusLabels } from '../../types/constants'
 import type { ProjectFormValues } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { calculateProgress, getProjectTasks } from '../../utils/metrics'
 import { Button } from '../ui/Button'
 import { Modal } from '../ui/Modal'
@@ -119,15 +120,19 @@ export function AppShell({ children }: AppShellProps) {
                   type="button"
                   onClick={() => setActiveProject(project.id)}
                   className={cn(
-                    'w-full rounded-xl border px-3 py-3 text-left transition',
+                    'pd-color-card w-full rounded-xl border px-3 py-3 pl-4 text-left transition',
+                    colorClass(project.color),
                     active
                       ? 'border-[color:var(--pd-primary)] bg-[color:var(--pd-accent)] shadow-sm'
                       : 'border-[color:var(--pd-border)] bg-[color:var(--pd-card)] hover:border-[color:var(--pd-border-strong)] hover:bg-[color:var(--pd-card-hover)]',
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="line-clamp-2 text-sm font-semibold text-[color:var(--pd-foreground-strong)]">
-                      {project.name}
+                    <span className="flex min-w-0 items-start gap-2">
+                      <span className="pd-color-dot mt-1.5" aria-hidden="true" />
+                      <span className="line-clamp-2 text-sm font-semibold text-[color:var(--pd-foreground-strong)]">
+                        {project.name}
+                      </span>
                     </span>
                     <span className="shrink-0 rounded-md bg-[color:var(--pd-muted)] px-1.5 py-0.5 text-[11px] text-[color:var(--pd-muted-foreground)]">
                       {progress}%

@@ -11,6 +11,7 @@ import type { AppData, LinkedEntityType, ResourceFormValues, ResourceLink, Resou
 import { linkedEntityName } from '../../utils/metrics'
 import { joinTags, splitTags } from '../../utils/text'
 import { Button } from '../ui/Button'
+import { ColorSelector } from '../ui/ColorSelector'
 import { SelectField, TextAreaField, TextField } from '../ui/Field'
 
 interface ResourceFormProps {
@@ -39,6 +40,7 @@ export function ResourceForm({
     type: resource?.type ?? 'folder',
     path: resource?.path ?? '',
     description: resource?.description ?? '',
+    color: resource?.color ?? 'slate',
     tags: resource?.tags ?? [],
   })
   const [tagText, setTagText] = useState(joinTags(values.tags))
@@ -192,6 +194,11 @@ export function ResourceForm({
         onChange={(event) => setTagText(event.target.value)}
         placeholder="assets, design"
         hint="Separate tags with commas."
+      />
+      <ColorSelector
+        value={values.color}
+        onChange={(color) => updateValue('color', color)}
+        hint="Groups related file and folder links visually."
       />
       {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       <div className="flex justify-end gap-2">

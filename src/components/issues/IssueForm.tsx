@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { issueSeverities, issueSeverityLabels, issueStatuses, issueStatusLabels } from '../../types/constants'
 import type { Issue, IssueFormValues, Task } from '../../types/models'
 import { Button } from '../ui/Button'
+import { ColorSelector } from '../ui/ColorSelector'
 import { SelectField, TextAreaField, TextField } from '../ui/Field'
 
 interface IssueFormProps {
@@ -17,6 +18,7 @@ export function IssueForm({ issue, tasks, onCancel, onSubmit }: IssueFormProps) 
     description: issue?.description ?? '',
     severity: issue?.severity ?? 'medium',
     status: issue?.status ?? 'open',
+    color: issue?.color ?? 'slate',
     relatedTaskId: issue?.relatedTaskId,
     resolutionNotes: issue?.resolutionNotes ?? '',
   })
@@ -103,6 +105,11 @@ export function IssueForm({ issue, tasks, onCancel, onSubmit }: IssueFormProps) 
           setValues((current) => ({ ...current, resolutionNotes: event.target.value }))
         }
         placeholder="What resolved this issue?"
+      />
+      <ColorSelector
+        value={values.color}
+        onChange={(color) => setValues((current) => ({ ...current, color }))}
+        hint="Issue color is for grouping; severity remains separate."
       />
       {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       <div className="flex justify-end gap-2">

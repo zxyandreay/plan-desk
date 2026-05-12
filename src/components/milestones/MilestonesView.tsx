@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useAppStore } from '../../stores/appStore'
 import { milestoneStatusLabels } from '../../types/constants'
 import type { Milestone, MilestoneFormValues, ResourceFormValues } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import { calculateMilestoneProgress, resourceCountForEntity } from '../../utils/metrics'
 import { Badge } from '../ui/Badge'
@@ -79,12 +80,15 @@ export function MilestonesView({ projectId }: MilestonesViewProps) {
             const progress = calculateMilestoneProgress(data, milestone.id)
             const linkedResources = resourceCountForEntity(resources, 'milestone', milestone.id)
             return (
-              <article key={milestone.id} className="pd-card p-4">
+              <article key={milestone.id} className={`pd-card pd-color-card p-4 pl-5 ${colorClass(milestone.color)}`}>
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">
-                      {milestone.title}
-                    </h4>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="pd-color-dot" aria-hidden="true" />
+                      <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">
+                        {milestone.title}
+                      </h4>
+                    </div>
                     <p className="mt-1 text-sm text-[color:var(--pd-muted-foreground)]">
                       {milestone.description || 'No description.'}
                     </p>

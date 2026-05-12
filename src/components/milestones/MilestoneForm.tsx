@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { milestoneStatuses, milestoneStatusLabels } from '../../types/constants'
 import type { Milestone, MilestoneFormValues } from '../../types/models'
 import { Button } from '../ui/Button'
+import { ColorSelector } from '../ui/ColorSelector'
 import { SelectField, TextAreaField, TextField } from '../ui/Field'
 
 interface MilestoneFormProps {
@@ -15,6 +16,7 @@ export function MilestoneForm({ milestone, onCancel, onSubmit }: MilestoneFormPr
     title: milestone?.title ?? '',
     description: milestone?.description ?? '',
     status: milestone?.status ?? 'not_started',
+    color: milestone?.color ?? 'slate',
     dueDate: milestone?.dueDate ?? '',
   })
   const [error, setError] = useState('')
@@ -65,6 +67,11 @@ export function MilestoneForm({ milestone, onCancel, onSubmit }: MilestoneFormPr
           onChange={(event) => setValues((current) => ({ ...current, dueDate: event.target.value }))}
         />
       </div>
+      <ColorSelector
+        value={values.color}
+        onChange={(color) => setValues((current) => ({ ...current, color }))}
+        hint="Milestone color appears on milestone cards and related task badges."
+      />
       {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       <div className="flex justify-end gap-2">
         <Button onClick={onCancel}>Cancel</Button>

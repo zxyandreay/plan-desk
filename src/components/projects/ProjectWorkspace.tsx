@@ -17,6 +17,7 @@ import { copyText, openLinkedPath } from '../../lib/fileSystem'
 import { useAppStore, type ProjectTab } from '../../stores/appStore'
 import { projectPriorityLabels, projectStatusLabels } from '../../types/constants'
 import type { ProjectFormValues } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import {
   calculateProgress,
@@ -124,10 +125,11 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
 
   return (
     <div className="pd-page space-y-5">
-      <header className="pd-card p-5">
+      <header className={`pd-card pd-color-header p-5 ${colorClass(project.color)}`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
+              <span className="pd-color-dot" aria-hidden="true" />
               <h2 className="text-2xl font-semibold tracking-normal text-[color:var(--pd-foreground-strong)]">
                 {project.name}
               </h2>
@@ -279,8 +281,11 @@ function ProjectOverview({ projectId }: { projectId: string }) {
               .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
               .slice(0, 5)
               .map((task) => (
-                <div key={task.id} className="pd-row px-3 py-2">
-                  <div className="text-sm font-medium text-[color:var(--pd-foreground)]">{task.title}</div>
+                <div key={task.id} className={`pd-row px-3 py-2 ${colorClass(task.color)}`}>
+                  <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--pd-foreground)]">
+                    <span className="pd-color-dot" aria-hidden="true" />
+                    <span className="line-clamp-2">{task.title}</span>
+                  </div>
                   <div className="text-xs text-[color:var(--pd-muted-foreground)]">
                     {formatDate(task.dueDate)}
                   </div>

@@ -11,7 +11,9 @@ It is Windows-first through Tauri, React, and TypeScript, with a portable archit
 - Dashboard with project cards, progress, due-soon work, recent projects, and attention counts.
 - Project workspaces with Overview, Milestones, Tasks, Issues, Notes, Files / Resources, and Report views.
 - CRUD for projects, milestones, tasks, issues, notes, and resource links.
-- Task board and list views, including drag-and-drop status changes on the board.
+- Color-coded projects, milestones, tasks, issues, notes, and resources for subtle visual organization.
+- Task board and list views, including drag-and-drop status changes on a horizontally scrollable kanban board.
+- Improved desktop board readability with fixed-width columns, clearer task cards, and intentional empty columns.
 - Focus view for overdue work, due today, due this week, high-priority tasks, blocked tasks, critical issues, and missing resource links.
 - Project reports with copyable/downloadable Markdown, JSON backup export, and CSV task export.
 - JSON import with validation and confirmation before replacing current local data.
@@ -109,12 +111,12 @@ The build script runs install, typecheck, lint, and Tauri's NSIS build. It copie
 
 ```text
 release/
-  PlanDesk_1.1.3_x64-setup.exe
-  PlanDesk_1.1.3_x64.exe
+  PlanDesk_1.2.0_x64-setup.exe
+  PlanDesk_1.2.0_x64.exe
   PlanDesk.exe
 ```
 
-Use `PlanDesk_1.1.3_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk_1.1.3_x64.exe` or `PlanDesk.exe` when you want to launch the built app directly from the release folder.
+Use `PlanDesk_1.2.0_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk_1.2.0_x64.exe` or `PlanDesk.exe` when you want to launch the built app directly from the release folder.
 
 Tauri uses Microsoft WebView2 internally to render the app window, but PlanDesk opens like a normal desktop app. No browser tab or Vite dev server is needed after building.
 
@@ -205,7 +207,7 @@ vX.Y.Z
 Example:
 
 ```text
-v1.1.2
+v1.2.0
 ```
 
 Every official release should include an updated app version, release commit, annotated Git tag, rebuilt Windows installer, GitHub Release notes, and uploaded installer artifacts.

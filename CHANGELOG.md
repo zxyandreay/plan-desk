@@ -2,6 +2,14 @@
 
 All meaningful fixes, additions, and release packaging changes should include an appropriate version bump across `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and visible app/version docs.
 
+## 1.2.0 - 2026-05-12
+
+- Added color coding for projects, milestones, tasks, issues, notes, and linked resources.
+- Added a shared color palette selector and subtle light/dark color accents across cards, rows, and forms.
+- Improved the Tasks board with fixed-width kanban columns and horizontal scrolling.
+- Improved task card spacing, metadata grouping, milestone indicators, and drag handle behavior.
+- Improved board column spacing, count alignment, drag-over state, and empty column messages.
+
 ## 1.1.3 - 2026-05-11
 
 - Fixed report exports in the desktop app by using native Save dialogs and a focused Tauri file-write command.

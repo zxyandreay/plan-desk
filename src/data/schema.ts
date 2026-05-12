@@ -1,6 +1,8 @@
 import { z } from 'zod'
+import { colorTokens } from '../types/colors'
 
 const pathHealthSchema = z.enum(['available', 'missing', 'unknown'])
+const colorTokenSchema = z.enum(colorTokens)
 const projectStatusSchema = z.enum(['planning', 'active', 'on_hold', 'completed', 'archived'])
 const projectPrioritySchema = z.enum(['low', 'medium', 'high'])
 const milestoneStatusSchema = z.enum(['not_started', 'in_progress', 'completed'])
@@ -19,6 +21,7 @@ const projectSchema = z.object({
   goal: z.string().catch(''),
   status: projectStatusSchema.catch('planning'),
   priority: projectPrioritySchema.catch('medium'),
+  color: colorTokenSchema.optional().catch(undefined),
   startDate: z.string().catch(''),
   dueDate: z.string().catch(''),
   rootFolderPath: z.string().optional(),
@@ -33,6 +36,7 @@ const milestoneSchema = z.object({
   title: z.string().min(1),
   description: z.string().catch(''),
   status: milestoneStatusSchema.catch('not_started'),
+  color: colorTokenSchema.optional().catch(undefined),
   dueDate: z.string().catch(''),
   order: z.number().catch(0),
   createdAt: z.string().min(1),
@@ -53,6 +57,7 @@ const taskSchema = z.object({
   description: z.string().catch(''),
   status: taskStatusSchema.catch('todo'),
   priority: taskPrioritySchema.catch('medium'),
+  color: colorTokenSchema.optional().catch(undefined),
   dueDate: z.string().catch(''),
   assignee: z.string().optional(),
   tags: z.array(z.string()).catch([]),
@@ -69,6 +74,7 @@ const issueSchema = z.object({
   description: z.string().catch(''),
   severity: issueSeveritySchema.catch('medium'),
   status: issueStatusSchema.catch('open'),
+  color: colorTokenSchema.optional().catch(undefined),
   resolutionNotes: z.string().catch(''),
   createdAt: z.string().min(1),
   updatedAt: z.string().min(1),
@@ -79,6 +85,7 @@ const noteSchema = z.object({
   projectId: z.string().min(1),
   title: z.string().min(1),
   content: z.string().catch(''),
+  color: colorTokenSchema.optional().catch(undefined),
   createdAt: z.string().min(1),
   updatedAt: z.string().min(1),
 })
@@ -92,6 +99,7 @@ const resourceSchema = z.object({
   type: resourceTypeSchema.catch('folder'),
   path: z.string().min(1),
   description: z.string().optional(),
+  color: colorTokenSchema.optional().catch(undefined),
   tags: z.array(z.string()).catch([]),
   isMissing: z.boolean().optional(),
   pathHealth: pathHealthSchema.optional(),

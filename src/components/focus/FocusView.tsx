@@ -2,6 +2,7 @@ import { AlertTriangle, CalendarClock, FileWarning, Flame, ListChecks } from 'lu
 import { useAppStore } from '../../stores/appStore'
 import { issueSeverityLabels, taskPriorityLabels, taskStatusLabels } from '../../types/constants'
 import type { Issue, ResourceLink, Task } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import { getFocusItems, projectForIssue, projectForTask } from '../../utils/metrics'
 import { Badge } from '../ui/Badge'
@@ -107,10 +108,13 @@ function TaskPanel({
                 key={task.id}
                 type="button"
                 onClick={() => onOpen(task.projectId)}
-                className="pd-row w-full px-3 py-2 text-left"
+                className={`pd-row w-full px-3 py-2 text-left ${colorClass(task.color)}`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium text-[color:var(--pd-foreground-strong)]">{task.title}</span>
+                  <span className="flex min-w-0 items-center gap-2 font-medium text-[color:var(--pd-foreground-strong)]">
+                    <span className="pd-color-dot" aria-hidden="true" />
+                    <span className="line-clamp-2">{task.title}</span>
+                  </span>
                   <Badge tone={task.priority === 'urgent' ? 'red' : 'amber'}>
                     {taskPriorityLabels[task.priority]}
                   </Badge>
@@ -153,10 +157,13 @@ function IssuePanel({
                 key={issue.id}
                 type="button"
                 onClick={() => onOpen(issue.projectId)}
-                className="pd-row w-full px-3 py-2 text-left"
+                className={`pd-row w-full px-3 py-2 text-left ${colorClass(issue.color)}`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium text-[color:var(--pd-foreground-strong)]">{issue.title}</span>
+                  <span className="flex min-w-0 items-center gap-2 font-medium text-[color:var(--pd-foreground-strong)]">
+                    <span className="pd-color-dot" aria-hidden="true" />
+                    <span className="line-clamp-2">{issue.title}</span>
+                  </span>
                   <Badge tone={issue.severity === 'critical' ? 'red' : 'amber'}>
                     {issueSeverityLabels[issue.severity]}
                   </Badge>
@@ -199,10 +206,13 @@ function ResourcePanel({
                 key={resource.id}
                 type="button"
                 onClick={() => onOpen(resource.projectId)}
-                className="pd-row pd-danger-row w-full px-3 py-2 text-left"
+                className={`pd-row pd-danger-row w-full px-3 py-2 text-left ${colorClass(resource.color)}`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium text-[color:var(--pd-foreground-strong)]">{resource.label}</span>
+                  <span className="flex min-w-0 items-center gap-2 font-medium text-[color:var(--pd-foreground-strong)]">
+                    <span className="pd-color-dot" aria-hidden="true" />
+                    <span className="line-clamp-2">{resource.label}</span>
+                  </span>
                   <Badge tone="red">Missing</Badge>
                 </div>
                 <div className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">

@@ -2,6 +2,7 @@ import { Edit3, Link2, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useAppStore } from '../../stores/appStore'
 import type { Note, NoteFormValues, ResourceFormValues } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import { resourceCountForEntity } from '../../utils/metrics'
 import { Button } from '../ui/Button'
@@ -70,10 +71,13 @@ export function NotesView({ projectId }: NotesViewProps) {
           {notes.map((note) => {
             const linkedResources = resourceCountForEntity(resources, 'note', note.id)
             return (
-              <article key={note.id} className="pd-card p-4">
+              <article key={note.id} className={`pd-card pd-color-card p-4 pl-5 ${colorClass(note.color)}`}>
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{note.title}</h4>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="pd-color-dot" aria-hidden="true" />
+                      <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{note.title}</h4>
+                    </div>
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[color:var(--pd-muted-foreground)]">
                       {note.content || 'No note content yet.'}
                     </p>

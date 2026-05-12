@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Note, NoteFormValues } from '../../types/models'
 import { Button } from '../ui/Button'
+import { ColorSelector } from '../ui/ColorSelector'
 import { TextAreaField, TextField } from '../ui/Field'
 
 interface NoteFormProps {
@@ -13,6 +14,7 @@ export function NoteForm({ note, onCancel, onSubmit }: NoteFormProps) {
   const [values, setValues] = useState<NoteFormValues>({
     title: note?.title ?? '',
     content: note?.content ?? '',
+    color: note?.color ?? 'slate',
   })
   const [error, setError] = useState('')
 
@@ -39,6 +41,11 @@ export function NoteForm({ note, onCancel, onSubmit }: NoteFormProps) {
         onChange={(event) => setValues((current) => ({ ...current, content: event.target.value }))}
         rows={10}
         placeholder="Decisions, references, reminders, or project context"
+      />
+      <ColorSelector
+        value={values.color}
+        onChange={(color) => setValues((current) => ({ ...current, color }))}
+        hint="Adds a subtle note marker in the project workspace."
       />
       {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       <div className="flex justify-end gap-2">

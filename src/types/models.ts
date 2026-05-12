@@ -1,3 +1,7 @@
+import type { ColorToken } from './colors'
+
+export type { ColorToken } from './colors'
+
 export type ProjectStatus = 'planning' | 'active' | 'on_hold' | 'completed' | 'archived'
 export type ProjectPriority = 'low' | 'medium' | 'high'
 export type MilestoneStatus = 'not_started' | 'in_progress' | 'completed'
@@ -19,6 +23,7 @@ export interface Project {
   goal: string
   status: ProjectStatus
   priority: ProjectPriority
+  color?: ColorToken
   startDate: string
   dueDate: string
   rootFolderPath?: string
@@ -33,6 +38,7 @@ export interface Milestone {
   title: string
   description: string
   status: MilestoneStatus
+  color?: ColorToken
   dueDate: string
   order: number
   createdAt: string
@@ -53,6 +59,7 @@ export interface Task {
   description: string
   status: TaskStatus
   priority: TaskPriority
+  color?: ColorToken
   dueDate: string
   assignee?: string
   tags: string[]
@@ -69,6 +76,7 @@ export interface Issue {
   description: string
   severity: IssueSeverity
   status: IssueStatus
+  color?: ColorToken
   resolutionNotes: string
   createdAt: string
   updatedAt: string
@@ -79,6 +87,7 @@ export interface Note {
   projectId: string
   title: string
   content: string
+  color?: ColorToken
   createdAt: string
   updatedAt: string
 }
@@ -92,6 +101,7 @@ export interface ResourceLink {
   type: ResourceType
   path: string
   description?: string
+  color?: ColorToken
   tags: string[]
   isMissing?: boolean
   pathHealth?: PathHealth
@@ -124,6 +134,7 @@ export interface ProjectFormValues {
   goal: string
   status: ProjectStatus
   priority: ProjectPriority
+  color?: ColorToken
   startDate: string
   dueDate: string
   rootFolderPath?: string
@@ -133,6 +144,7 @@ export interface MilestoneFormValues {
   title: string
   description: string
   status: MilestoneStatus
+  color?: ColorToken
   dueDate: string
 }
 
@@ -141,6 +153,7 @@ export interface TaskFormValues {
   description: string
   status: TaskStatus
   priority: TaskPriority
+  color?: ColorToken
   dueDate: string
   milestoneId?: string
   assignee?: string
@@ -153,6 +166,7 @@ export interface IssueFormValues {
   description: string
   severity: IssueSeverity
   status: IssueStatus
+  color?: ColorToken
   relatedTaskId?: string
   resolutionNotes: string
 }
@@ -160,6 +174,7 @@ export interface IssueFormValues {
 export interface NoteFormValues {
   title: string
   content: string
+  color?: ColorToken
 }
 
 export interface ResourceFormValues {
@@ -169,5 +184,6 @@ export interface ResourceFormValues {
   type: ResourceType
   path: string
   description?: string
+  color?: ColorToken
   tags: string[]
 }

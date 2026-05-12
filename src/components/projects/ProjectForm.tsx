@@ -4,6 +4,7 @@ import { chooseFolder } from '../../lib/fileSystem'
 import { projectPriorities, projectPriorityLabels, projectStatuses, projectStatusLabels } from '../../types/constants'
 import type { Project, ProjectFormValues } from '../../types/models'
 import { Button } from '../ui/Button'
+import { ColorSelector } from '../ui/ColorSelector'
 import { SelectField, TextAreaField, TextField } from '../ui/Field'
 
 interface ProjectFormProps {
@@ -20,6 +21,7 @@ export function ProjectForm({ project, onCancel, onSubmit }: ProjectFormProps) {
     goal: project?.goal ?? '',
     status: project?.status ?? 'planning',
     priority: project?.priority ?? 'medium',
+    color: project?.color ?? 'slate',
     startDate: project?.startDate ?? '',
     dueDate: project?.dueDate ?? '',
     rootFolderPath: project?.rootFolderPath,
@@ -90,6 +92,13 @@ export function ProjectForm({ project, onCancel, onSubmit }: ProjectFormProps) {
             </option>
           ))}
         </SelectField>
+        <div className="md:col-span-2">
+          <ColorSelector
+            value={values.color}
+            onChange={(color) => updateValue('color', color)}
+            hint="Used as a subtle visual accent across this project."
+          />
+        </div>
         <TextField
           label="Start date"
           type="date"

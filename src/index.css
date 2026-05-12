@@ -371,6 +371,280 @@ select:focus-visible {
   color: var(--pd-purple-foreground);
 }
 
+.pd-color-slate {
+  --pd-color-accent: #64748b;
+  --pd-color-soft: #f1f5f9;
+  --pd-color-border: #cbd5e1;
+  --pd-color-foreground: #334155;
+}
+
+.pd-color-blue {
+  --pd-color-accent: #2563eb;
+  --pd-color-soft: #eff6ff;
+  --pd-color-border: #bfdbfe;
+  --pd-color-foreground: #1d4ed8;
+}
+
+.pd-color-sky {
+  --pd-color-accent: #0284c7;
+  --pd-color-soft: #f0f9ff;
+  --pd-color-border: #bae6fd;
+  --pd-color-foreground: #0369a1;
+}
+
+.pd-color-teal {
+  --pd-color-accent: #0f766e;
+  --pd-color-soft: #f0fdfa;
+  --pd-color-border: #99f6e4;
+  --pd-color-foreground: #0f766e;
+}
+
+.pd-color-green {
+  --pd-color-accent: #15803d;
+  --pd-color-soft: #f0fdf4;
+  --pd-color-border: #bbf7d0;
+  --pd-color-foreground: #166534;
+}
+
+.pd-color-amber {
+  --pd-color-accent: #d97706;
+  --pd-color-soft: #fffbeb;
+  --pd-color-border: #fde68a;
+  --pd-color-foreground: #92400e;
+}
+
+.pd-color-orange {
+  --pd-color-accent: #ea580c;
+  --pd-color-soft: #fff7ed;
+  --pd-color-border: #fed7aa;
+  --pd-color-foreground: #c2410c;
+}
+
+.pd-color-red {
+  --pd-color-accent: #dc2626;
+  --pd-color-soft: #fef2f2;
+  --pd-color-border: #fecaca;
+  --pd-color-foreground: #b91c1c;
+}
+
+.pd-color-rose {
+  --pd-color-accent: #e11d48;
+  --pd-color-soft: #fff1f2;
+  --pd-color-border: #fecdd3;
+  --pd-color-foreground: #be123c;
+}
+
+.pd-color-purple {
+  --pd-color-accent: #7c3aed;
+  --pd-color-soft: #f5f3ff;
+  --pd-color-border: #ddd6fe;
+  --pd-color-foreground: #6d28d9;
+}
+
+.pd-color-violet {
+  --pd-color-accent: #6d5bd0;
+  --pd-color-soft: #f5f3ff;
+  --pd-color-border: #ddd6fe;
+  --pd-color-foreground: #5b4ac4;
+}
+
+:root[data-theme="dark"] .pd-color-slate {
+  --pd-color-accent: #94a3b8;
+  --pd-color-soft: #20242c;
+  --pd-color-border: #3b4350;
+  --pd-color-foreground: #cbd5e1;
+}
+
+:root[data-theme="dark"] .pd-color-blue {
+  --pd-color-accent: #60a5fa;
+  --pd-color-soft: #17243a;
+  --pd-color-border: #274164;
+  --pd-color-foreground: #bfdbfe;
+}
+
+:root[data-theme="dark"] .pd-color-sky {
+  --pd-color-accent: #38bdf8;
+  --pd-color-soft: #122b3a;
+  --pd-color-border: #22506a;
+  --pd-color-foreground: #bae6fd;
+}
+
+:root[data-theme="dark"] .pd-color-teal {
+  --pd-color-accent: #2dd4bf;
+  --pd-color-soft: #102b2a;
+  --pd-color-border: #1d5953;
+  --pd-color-foreground: #99f6e4;
+}
+
+:root[data-theme="dark"] .pd-color-green {
+  --pd-color-accent: #4ade80;
+  --pd-color-soft: #142a1d;
+  --pd-color-border: #2d5a3a;
+  --pd-color-foreground: #bbf7d0;
+}
+
+:root[data-theme="dark"] .pd-color-amber {
+  --pd-color-accent: #fbbf24;
+  --pd-color-soft: #2e2718;
+  --pd-color-border: #644d1c;
+  --pd-color-foreground: #fde68a;
+}
+
+:root[data-theme="dark"] .pd-color-orange {
+  --pd-color-accent: #fb923c;
+  --pd-color-soft: #321f14;
+  --pd-color-border: #6b3b1d;
+  --pd-color-foreground: #fed7aa;
+}
+
+:root[data-theme="dark"] .pd-color-red {
+  --pd-color-accent: #f87171;
+  --pd-color-soft: #331d22;
+  --pd-color-border: #66313a;
+  --pd-color-foreground: #fecaca;
+}
+
+:root[data-theme="dark"] .pd-color-rose {
+  --pd-color-accent: #fb7185;
+  --pd-color-soft: #351d28;
+  --pd-color-border: #6a3044;
+  --pd-color-foreground: #fecdd3;
+}
+
+:root[data-theme="dark"] .pd-color-purple {
+  --pd-color-accent: #a78bfa;
+  --pd-color-soft: #272239;
+  --pd-color-border: #4b3c76;
+  --pd-color-foreground: #ddd6fe;
+}
+
+:root[data-theme="dark"] .pd-color-violet {
+  --pd-color-accent: #8b7cf6;
+  --pd-color-soft: #26233b;
+  --pd-color-border: #453f72;
+  --pd-color-foreground: #ddd6fe;
+}
+
+.pd-color-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--pd-color-accent);
+  box-shadow: 0 0 0 3px var(--pd-color-soft);
+}
+
+.pd-color-card {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--pd-color-border) 54%, var(--pd-border));
+}
+
+.pd-color-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.25rem;
+  background: var(--pd-color-accent);
+}
+
+.pd-color-header {
+  border-top: 0.25rem solid var(--pd-color-accent);
+}
+
+.pd-color-pill {
+  display: inline-flex;
+  min-height: 1.5rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--pd-color-border);
+  border-radius: 0.375rem;
+  background: var(--pd-color-soft);
+  color: var(--pd-color-foreground);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.pd-color-swatch {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--pd-border);
+  border-radius: 0.6rem;
+  background: var(--pd-card);
+  color: var(--pd-color-foreground);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.pd-color-swatch:hover {
+  border-color: var(--pd-color-border);
+  background: var(--pd-color-soft);
+}
+
+.pd-color-swatch-active {
+  border-color: var(--pd-color-accent);
+  background: var(--pd-color-soft);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pd-color-accent) 18%, transparent);
+}
+
+.pd-color-swatch:active {
+  transform: translateY(1px);
+}
+
+.pd-color-swatch-dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: var(--pd-color-accent);
+}
+
+.pd-color-swatch svg {
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.2rem;
+}
+
+.pd-kanban-rail {
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pd-border-strong) transparent;
+}
+
+.pd-kanban-track {
+  display: flex;
+  width: max-content;
+  min-height: 30rem;
+  gap: 1rem;
+}
+
+.pd-kanban-column {
+  display: flex;
+  width: 20rem;
+  max-height: calc(100vh - 18rem);
+  min-height: 28rem;
+  flex: 0 0 20rem;
+  flex-direction: column;
+  background: var(--pd-panel);
+  border: 1px solid var(--pd-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--pd-shadow-sm);
+}
+
+.pd-kanban-column-over {
+  border-color: var(--pd-primary);
+  background: color-mix(in srgb, var(--pd-accent) 70%, var(--pd-panel));
+}
+
 .pd-row {
   background: var(--pd-panel);
   border: 1px solid var(--pd-border);

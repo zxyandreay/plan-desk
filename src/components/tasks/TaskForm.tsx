@@ -5,6 +5,7 @@ import type { Milestone, Subtask, Task, TaskFormValues } from '../../types/model
 import { createId } from '../../utils/id'
 import { joinTags, splitTags } from '../../utils/text'
 import { Button } from '../ui/Button'
+import { ColorSelector } from '../ui/ColorSelector'
 import { SelectField, TextAreaField, TextField } from '../ui/Field'
 
 interface TaskFormProps {
@@ -20,6 +21,7 @@ export function TaskForm({ task, milestones, onCancel, onSubmit }: TaskFormProps
     description: task?.description ?? '',
     status: task?.status ?? 'todo',
     priority: task?.priority ?? 'medium',
+    color: task?.color ?? 'slate',
     dueDate: task?.dueDate ?? '',
     milestoneId: task?.milestoneId,
     assignee: task?.assignee ?? '',
@@ -131,6 +133,11 @@ export function TaskForm({ task, milestones, onCancel, onSubmit }: TaskFormProps
           hint="Separate tags with commas."
         />
       </div>
+      <ColorSelector
+        value={values.color}
+        onChange={(color) => updateValue('color', color)}
+        hint="Adds a subtle strip and dot to this task in board and list views."
+      />
       <div className="pd-muted-panel p-4">
         <div className="flex items-end gap-2">
           <div className="flex-1">

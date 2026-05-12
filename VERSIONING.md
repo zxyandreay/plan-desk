@@ -106,4 +106,5 @@ Keep these app version references aligned:
 | 1.1.0 | v1.1.0 | Minor | Dark mode and production UI refinement release. | Reconstructed from commit `9506fee` |
 | 1.1.1 | v1.1.1 | Patch | PlanDesk app and installer icon release. | Reconstructed from commit `b34954c` |
 | 1.1.2 | v1.1.2 | Patch | Windows release icon and versioned EXE release; release workflow organization. | Existing |
-| 1.1.3 | v1.1.3 | Patch | Report export and backup download fix release. | Current release |
+| 1.1.3 | v1.1.3 | Patch | Report export and backup download fix release. | Existing |
+| 1.2.0 | v1.2.0 | Minor | Color coding and kanban board layout improvement release. | Current release |

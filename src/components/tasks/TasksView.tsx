@@ -1,11 +1,20 @@
 import { DndContext, type DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
-import { Edit3, Link2, Plus, Search, Trash2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Edit3, GripVertical, Link2, Paperclip, Plus, Search, Trash2, UserRound } from 'lucide-react'
+import { type ButtonHTMLAttributes, useMemo, useState } from 'react'
 import { useAppStore } from '../../stores/appStore'
 import { taskPriorities, taskPriorityLabels, taskStatusLabels, taskStatuses } from '../../types/constants'
-import type { ResourceFormValues, ResourceLink, Task, TaskFormValues, TaskPriority, TaskStatus } from '../../types/models'
+import type {
+  ColorToken,
+  ResourceFormValues,
+  ResourceLink,
+  Task,
+  TaskFormValues,
+  TaskPriority,
+  TaskStatus,
+} from '../../types/models'
 import { cn } from '../../lib/cn'
+import { colorClass } from '../../utils/colors'
 import { formatDate, isPastDate } from '../../utils/date'
 import { resourceCountForEntity } from '../../utils/metrics'
 import { Button } from '../ui/Button'
@@ -188,23 +197,25 @@ export function TasksView({ projectId }: TasksViewProps) {
         />
       ) : taskView === 'board' ? (
         <DndContext onDragEnd={handleDragEnd}>
-          <div className="grid min-h-96 gap-3 xl:grid-cols-6">
-            {taskStatuses.map((status) => (
-              <TaskColumn
-                key={status}
-                status={status}
-                tasks={tasks.filter((task) => task.status === status)}
-                milestones={milestones}
-                resources={projectResources}
-                onEdit={(task) => {
-                  setEditingTask(task)
-                  setTaskModalOpen(true)
-                }}
-                onDelete={setDeletingTask}
-                onLink={setResourceTarget}
-                onToggleSubtask={toggleSubtask}
-              />
-            ))}
+          <div className="pd-kanban-rail">
+            <div className="pd-kanban-track">
+              {taskStatuses.map((status) => (
+                <TaskColumn
+                  key={status}
+                  status={status}
+                  tasks={tasks.filter((task) => task.status === status)}
+                  milestones={milestones}
+                  resources={projectResources}
+                  onEdit={(task) => {
+                    setEditingTask(task)
+                    setTaskModalOpen(true)
+                  }}
+                  onDelete={setDeletingTask}
+                  onLink={setResourceTarget}
+                  onToggleSubtask={toggleSubtask}
+                />
+              ))}
+            </div>
           </div>
         </DndContext>
       ) : (
@@ -286,7 +297,7 @@ function TaskColumn({
 }: {
   status: TaskStatus
   tasks: Task[]
-  milestones: { id: string; title: string }[]
+  milestones: { id: string; title: string; color?: ColorToken }[]
   resources: ResourceLink[]
   onEdit: (task: Task) => void
   onDelete: (task: Task) => void
@@ -299,29 +310,35 @@ function TaskColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        'pd-muted-panel p-3 transition',
-        isOver ? 'border-[color:var(--pd-primary)] bg-[color:var(--pd-accent)]' : '',
+        'pd-kanban-column transition',
+        isOver ? 'pd-kanban-column-over' : '',
       )}
     >
-      <div className="mb-3 flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-[color:var(--pd-foreground)]">{taskStatusLabels[status]}</h4>
-        <span className="rounded-md bg-[color:var(--pd-card)] px-2 py-0.5 text-xs text-[color:var(--pd-muted-foreground)]">
+      <div className="flex items-center justify-between border-b border-[color:var(--pd-border)] px-3 py-3">
+        <h4 className="text-sm font-semibold text-[color:var(--pd-foreground-strong)]">{taskStatusLabels[status]}</h4>
+        <span className="rounded-md border border-[color:var(--pd-border)] bg-[color:var(--pd-card)] px-2 py-0.5 text-xs font-semibold text-[color:var(--pd-muted-foreground)]">
           {tasks.length}
         </span>
       </div>
-      <div className="space-y-3">
-        {tasks.map((task) => (
-          <DraggableTaskCard
-            key={task.id}
-            task={task}
-            milestones={milestones}
-            resources={resources}
-            onEdit={() => onEdit(task)}
-            onDelete={() => onDelete(task)}
-            onLink={() => onLink(task)}
-            onToggleSubtask={onToggleSubtask}
-          />
-        ))}
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3 pr-2 scrollbar-thin">
+        {tasks.length ? (
+          tasks.map((task) => (
+            <DraggableTaskCard
+              key={task.id}
+              task={task}
+              milestones={milestones}
+              resources={resources}
+              onEdit={() => onEdit(task)}
+              onDelete={() => onDelete(task)}
+              onLink={() => onLink(task)}
+              onToggleSubtask={onToggleSubtask}
+            />
+          ))
+        ) : (
+          <div className="rounded-lg border border-dashed border-[color:var(--pd-border-strong)] px-3 py-6 text-center text-sm text-[color:var(--pd-muted-foreground)]">
+            No tasks
+          </div>
+        )}
       </div>
     </div>
   )
@@ -337,17 +354,24 @@ function DraggableTaskCard(props: TaskCardProps) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <TaskCard {...props} compact />
+    <div ref={setNodeRef} style={style}>
+      <TaskCard
+        {...props}
+        compact
+        dragHandleProps={{ ...attributes, ...listeners } as ButtonHTMLAttributes<HTMLButtonElement>}
+        isDragging={isDragging}
+      />
     </div>
   )
 }
 
 interface TaskCardProps {
   task: Task
-  milestones: { id: string; title: string }[]
+  milestones: { id: string; title: string; color?: ColorToken }[]
   resources: ResourceLink[]
   compact?: boolean
+  dragHandleProps?: ButtonHTMLAttributes<HTMLButtonElement>
+  isDragging?: boolean
   onEdit: () => void
   onDelete: () => void
   onLink: () => void
@@ -359,6 +383,8 @@ function TaskCard({
   milestones,
   resources,
   compact = false,
+  dragHandleProps,
+  isDragging = false,
   onEdit,
   onDelete,
   onLink,
@@ -373,15 +399,38 @@ function TaskCard({
   const overdue = isPastDate(task.dueDate) && task.status !== 'done'
 
   return (
-    <article className="pd-card p-4">
+    <article
+      className={cn(
+        'pd-card pd-color-card p-4 pl-5',
+        colorClass(task.color),
+        compact ? 'p-3 pl-5' : '',
+        isDragging ? 'border-[color:var(--pd-primary)] shadow-lg' : '',
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h4 className="font-semibold text-[color:var(--pd-foreground-strong)]">{task.title}</h4>
-          {!compact && task.description ? (
-            <p className="mt-2 text-sm leading-6 text-[color:var(--pd-muted-foreground)]">
-              {task.description}
-            </p>
-          ) : null}
+        <div className="flex min-w-0 items-start gap-2">
+          {dragHandleProps ? (
+            <button
+              type="button"
+              aria-label={`Drag ${task.title}`}
+              className="mt-0.5 grid h-7 w-7 shrink-0 cursor-grab place-items-center rounded-md text-[color:var(--pd-subtle-foreground)] hover:bg-[color:var(--pd-muted)] hover:text-[color:var(--pd-foreground-strong)] active:cursor-grabbing"
+              {...dragHandleProps}
+            >
+              <GripVertical className="h-4 w-4" />
+            </button>
+          ) : (
+            <span className="pd-color-dot mt-2" aria-hidden="true" />
+          )}
+          <div className="min-w-0">
+            <h4 className="line-clamp-2 font-semibold leading-5 text-[color:var(--pd-foreground-strong)]">
+              {task.title}
+            </h4>
+            {!compact && task.description ? (
+              <p className="mt-2 text-sm leading-6 text-[color:var(--pd-muted-foreground)]">
+                {task.description}
+              </p>
+            ) : null}
+          </div>
         </div>
         <Badge tone={task.priority === 'urgent' ? 'red' : task.priority === 'high' ? 'amber' : 'slate'}>
           {taskPriorityLabels[task.priority]}
@@ -392,17 +441,28 @@ function TaskCard({
           {taskStatusLabels[task.status]}
         </Badge>
         {overdue ? <Badge tone="red">Overdue</Badge> : null}
-        {milestone ? <Badge>{milestone.title}</Badge> : null}
+        {milestone ? (
+          <span className={`pd-color-pill ${colorClass(milestone.color)}`}>
+            <span className="pd-color-dot" aria-hidden="true" />
+            {milestone.title}
+          </span>
+        ) : null}
         {task.tags.map((tag) => (
           <Badge key={tag} tone="purple">
             {tag}
           </Badge>
         ))}
       </div>
-      <div className="mt-3 grid gap-2 text-xs text-[color:var(--pd-muted-foreground)] md:grid-cols-3">
+      <div className="mt-3 grid gap-2 text-xs text-[color:var(--pd-muted-foreground)] sm:grid-cols-2">
         <span>Due {formatDate(task.dueDate)}</span>
-        <span>{linkedResources} resources</span>
-        <span>{task.assignee || 'Unassigned'}</span>
+        <span className="inline-flex items-center gap-1.5">
+          <Paperclip className="h-3.5 w-3.5" />
+          {linkedResources} resources
+        </span>
+        <span className="inline-flex min-w-0 items-center gap-1.5 sm:col-span-2">
+          <UserRound className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{task.assignee || 'Unassigned'}</span>
+        </span>
       </div>
       {task.subtasks.length ? (
         <div className="mt-3">

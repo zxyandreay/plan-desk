@@ -2,6 +2,7 @@ import { AlertTriangle, CalendarClock, CheckCircle2, FolderCheck, FolderOpen, Pl
 import { useMemo, useState } from 'react'
 import { projectPriorityLabels, projectStatusLabels } from '../../types/constants'
 import type { ProjectFormValues } from '../../types/models'
+import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import {
   calculateProgress,
@@ -141,13 +142,16 @@ export function Dashboard() {
                         key={project.id}
                         type="button"
                         onClick={() => setActiveProject(project.id)}
-                        className="pd-card pd-card-interactive p-4 text-left"
+                        className={`pd-card pd-card-interactive pd-color-card p-4 pl-5 text-left ${colorClass(project.color)}`}
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h4 className="text-base font-semibold text-[color:var(--pd-foreground-strong)]">
-                              {project.name}
-                            </h4>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="pd-color-dot" aria-hidden="true" />
+                              <h4 className="line-clamp-2 text-base font-semibold text-[color:var(--pd-foreground-strong)]">
+                                {project.name}
+                              </h4>
+                            </div>
                             <p className="mt-1 text-sm text-[color:var(--pd-muted-foreground)]">
                               {project.category || 'Uncategorized'}
                             </p>
@@ -190,10 +194,11 @@ export function Dashboard() {
                           key={task.id}
                           type="button"
                           onClick={() => setActiveProject(task.projectId)}
-                          className="pd-row w-full px-3 py-2 text-left"
+                          className={`pd-row w-full px-3 py-2 text-left ${colorClass(task.color)}`}
                         >
-                          <div className="text-sm font-medium text-[color:var(--pd-foreground-strong)]">
-                            {task.title}
+                          <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--pd-foreground-strong)]">
+                            <span className="pd-color-dot" aria-hidden="true" />
+                            <span className="line-clamp-2">{task.title}</span>
                           </div>
                           <div className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">
                             {project?.name ?? 'Project'} · {formatDate(task.dueDate)}
