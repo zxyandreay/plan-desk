@@ -1,4 +1,5 @@
 import { AlertTriangle, CalendarClock, FileWarning, Flame, ListChecks } from 'lucide-react'
+import { getProjectWorkflowColumns, getTaskWorkflowColumn } from '../../data/templates'
 import { useAppStore } from '../../stores/appStore'
 import { issueSeverityLabels, taskPriorityLabels, taskStatusLabels } from '../../types/constants'
 import type { Issue, ResourceLink, Task } from '../../types/models'
@@ -103,6 +104,8 @@ function TaskPanel({
         <div className="space-y-2">
           {tasks.slice(0, 8).map((task) => {
             const project = projectForTask(data, task)
+            const columns = getProjectWorkflowColumns(data.workflowColumns, task.projectId)
+            const column = getTaskWorkflowColumn(task, columns)
             return (
               <button
                 key={task.id}
@@ -120,7 +123,7 @@ function TaskPanel({
                   </Badge>
                 </div>
                 <div className="mt-1 text-xs text-[color:var(--pd-muted-foreground)]">
-                  {project?.name ?? 'Project'} · {taskStatusLabels[task.status]} · Due {formatDate(task.dueDate)}
+                  {project?.name ?? 'Project'} - {column?.name ?? taskStatusLabels[task.status]} - Due {formatDate(task.dueDate)}
                 </div>
               </button>
             )

@@ -4,6 +4,7 @@ export function createEmptyData(): AppData {
   return {
     version: 1,
     projects: [],
+    workflowColumns: [],
     milestones: [],
     tasks: [],
     issues: [],

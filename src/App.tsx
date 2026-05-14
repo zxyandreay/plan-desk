@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { Dashboard } from './components/dashboard/Dashboard'
+import { CalendarView } from './components/calendar/CalendarView'
 import { FocusView } from './components/focus/FocusView'
 import { AppShell } from './components/layout/AppShell'
 import { ProjectWorkspace } from './components/projects/ProjectWorkspace'
@@ -38,6 +39,8 @@ function App() {
       <ProjectWorkspace projectId={activeProjectId} />
     ) : activeView === 'focus' ? (
       <FocusView />
+    ) : activeView === 'calendar' ? (
+      <CalendarView />
     ) : activeView === 'settings' ? (
       <SettingsView />
     ) : (

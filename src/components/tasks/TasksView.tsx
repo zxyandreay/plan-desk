@@ -1,9 +1,15 @@
 import { DndContext, type DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
-import { Edit3, GripVertical, Link2, Paperclip, Plus, Search, Trash2, UserRound } from 'lucide-react'
+import { Edit3, GripVertical, Link2, Paperclip, Plus, Search, Settings2, Trash2, UserRound } from 'lucide-react'
 import { type ButtonHTMLAttributes, useMemo, useState } from 'react'
+import {
+  getProjectWorkflowColumns,
+  getTaskWorkflowColumn,
+  isTaskBlockedByWorkflow,
+  isTaskCompletedByWorkflow,
+} from '../../data/templates'
 import { useAppStore } from '../../stores/appStore'
-import { taskPriorities, taskPriorityLabels, taskStatusLabels, taskStatuses } from '../../types/constants'
+import { taskPriorities, taskPriorityLabels, taskStatusLabels } from '../../types/constants'
 import type {
   ColorToken,
   ResourceFormValues,
@@ -11,7 +17,7 @@ import type {
   Task,
   TaskFormValues,
   TaskPriority,
-  TaskStatus,
+  WorkflowColumn,
 } from '../../types/models'
 import { cn } from '../../lib/cn'
 import { colorClass } from '../../utils/colors'
@@ -25,6 +31,7 @@ import { Modal } from '../ui/Modal'
 import { ProgressBar } from '../ui/ProgressBar'
 import { ResourceForm } from '../resources/ResourceForm'
 import { TaskForm } from './TaskForm'
+import { WorkflowManager } from './WorkflowManager'
 
 interface TasksViewProps {
   projectId: string
@@ -44,13 +51,15 @@ export function TasksView({ projectId }: TasksViewProps) {
   const [deletingTask, setDeletingTask] = useState<Task | undefined>()
   const [resourceTarget, setResourceTarget] = useState<Task | undefined>()
   const [isTaskModalOpen, setTaskModalOpen] = useState(false)
+  const [isWorkflowModalOpen, setWorkflowModalOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all')
+  const [columnFilter, setColumnFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState<'all' | TaskPriority>('all')
   const [milestoneFilter, setMilestoneFilter] = useState('all')
 
   const milestones = data.milestones.filter((milestone) => milestone.projectId === projectId)
   const projectResources = data.resources.filter((resource) => resource.projectId === projectId)
+  const workflowColumns = getProjectWorkflowColumns(data.workflowColumns, projectId)
   const tasks = useMemo(() => {
     const normalized = query.trim().toLowerCase()
     return data.tasks.filter((task) => {
@@ -62,12 +71,13 @@ export function TasksView({ projectId }: TasksViewProps) {
         .join(' ')
         .toLowerCase()
         .includes(normalized)
-      const matchesStatus = statusFilter === 'all' || task.status === statusFilter
+      const taskColumn = getTaskWorkflowColumn(task, workflowColumns)
+      const matchesStatus = columnFilter === 'all' || taskColumn?.id === columnFilter
       const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter
       const matchesMilestone = milestoneFilter === 'all' || task.milestoneId === milestoneFilter
       return matchesText && matchesStatus && matchesPriority && matchesMilestone
     })
-  }, [data.tasks, milestoneFilter, priorityFilter, projectId, query, statusFilter])
+  }, [columnFilter, data.tasks, milestoneFilter, priorityFilter, projectId, query, workflowColumns])
 
   const submitTask = (values: TaskFormValues) => {
     if (editingTask) {
@@ -86,9 +96,9 @@ export function TasksView({ projectId }: TasksViewProps) {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const taskId = String(event.active.id)
-    const status = event.over?.id as TaskStatus | undefined
-    if (status && taskStatuses.includes(status)) {
-      moveTask(taskId, status)
+    const columnId = event.over?.id ? String(event.over.id) : undefined
+    if (columnId && workflowColumns.some((column) => column.id === columnId)) {
+      moveTask(taskId, columnId)
     }
   }
 
@@ -123,6 +133,12 @@ export function TasksView({ projectId }: TasksViewProps) {
             </button>
           </div>
           <Button
+            icon={<Settings2 className="h-4 w-4" />}
+            onClick={() => setWorkflowModalOpen(true)}
+          >
+            Workflow
+          </Button>
+          <Button
             variant="primary"
             icon={<Plus className="h-4 w-4" />}
             onClick={() => {
@@ -149,14 +165,14 @@ export function TasksView({ projectId }: TasksViewProps) {
           </div>
           <select
             aria-label="Filter status"
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value as 'all' | TaskStatus)}
+            value={columnFilter}
+            onChange={(event) => setColumnFilter(event.target.value)}
             className="pd-input h-9 px-3 text-sm"
           >
-            <option value="all">All statuses</option>
-            {taskStatuses.map((status) => (
-              <option key={status} value={status}>
-                {taskStatusLabels[status]}
+            <option value="all">All columns</option>
+            {workflowColumns.map((column) => (
+              <option key={column.id} value={column.id}>
+                {column.name}
               </option>
             ))}
           </select>
@@ -199,13 +215,14 @@ export function TasksView({ projectId }: TasksViewProps) {
         <DndContext onDragEnd={handleDragEnd}>
           <div className="pd-kanban-rail">
             <div className="pd-kanban-track">
-              {taskStatuses.map((status) => (
+              {workflowColumns.map((column) => (
                 <TaskColumn
-                  key={status}
-                  status={status}
-                  tasks={tasks.filter((task) => task.status === status)}
+                  key={column.id}
+                  column={column}
+                  tasks={tasks.filter((task) => getTaskWorkflowColumn(task, workflowColumns)?.id === column.id)}
                   milestones={milestones}
                   resources={projectResources}
+                  workflowColumns={workflowColumns}
                   onEdit={(task) => {
                     setEditingTask(task)
                     setTaskModalOpen(true)
@@ -226,6 +243,7 @@ export function TasksView({ projectId }: TasksViewProps) {
               task={task}
               milestones={milestones}
               resources={projectResources}
+              workflowColumns={workflowColumns}
               onEdit={() => {
                 setEditingTask(task)
                 setTaskModalOpen(true)
@@ -249,12 +267,20 @@ export function TasksView({ projectId }: TasksViewProps) {
         <TaskForm
           task={editingTask}
           milestones={milestones}
+          workflowColumns={workflowColumns}
           onCancel={() => {
             setEditingTask(undefined)
             setTaskModalOpen(false)
           }}
           onSubmit={submitTask}
         />
+      </Modal>
+      <Modal
+        title="Project workflow"
+        isOpen={isWorkflowModalOpen}
+        onClose={() => setWorkflowModalOpen(false)}
+      >
+        <WorkflowManager projectId={projectId} onClose={() => setWorkflowModalOpen(false)} />
       </Modal>
       <Modal title="Link task resource" isOpen={Boolean(resourceTarget)} onClose={() => setResourceTarget(undefined)}>
         {resourceTarget ? (
@@ -286,36 +312,42 @@ export function TasksView({ projectId }: TasksViewProps) {
 }
 
 function TaskColumn({
-  status,
+  column,
   tasks,
   milestones,
   resources,
+  workflowColumns,
   onEdit,
   onDelete,
   onLink,
   onToggleSubtask,
 }: {
-  status: TaskStatus
+  column: WorkflowColumn
   tasks: Task[]
   milestones: { id: string; title: string; color?: ColorToken }[]
   resources: ResourceLink[]
+  workflowColumns: WorkflowColumn[]
   onEdit: (task: Task) => void
   onDelete: (task: Task) => void
   onLink: (task: Task) => void
   onToggleSubtask: (taskId: string, subtaskId: string) => void
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id: status })
+  const { setNodeRef, isOver } = useDroppable({ id: column.id })
 
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        'pd-kanban-column transition',
+        'pd-kanban-column pd-color-card transition',
+        colorClass(column.color),
         isOver ? 'pd-kanban-column-over' : '',
       )}
     >
       <div className="flex items-center justify-between border-b border-[color:var(--pd-border)] px-3 py-3">
-        <h4 className="text-sm font-semibold text-[color:var(--pd-foreground-strong)]">{taskStatusLabels[status]}</h4>
+        <h4 className="flex items-center gap-2 text-sm font-semibold text-[color:var(--pd-foreground-strong)]">
+          <span className="pd-color-dot" aria-hidden="true" />
+          {column.name}
+        </h4>
         <span className="rounded-md border border-[color:var(--pd-border)] bg-[color:var(--pd-card)] px-2 py-0.5 text-xs font-semibold text-[color:var(--pd-muted-foreground)]">
           {tasks.length}
         </span>
@@ -328,6 +360,7 @@ function TaskColumn({
               task={task}
               milestones={milestones}
               resources={resources}
+              workflowColumns={workflowColumns}
               onEdit={() => onEdit(task)}
               onDelete={() => onDelete(task)}
               onLink={() => onLink(task)}
@@ -369,6 +402,7 @@ interface TaskCardProps {
   task: Task
   milestones: { id: string; title: string; color?: ColorToken }[]
   resources: ResourceLink[]
+  workflowColumns: WorkflowColumn[]
   compact?: boolean
   dragHandleProps?: ButtonHTMLAttributes<HTMLButtonElement>
   isDragging?: boolean
@@ -382,6 +416,7 @@ function TaskCard({
   task,
   milestones,
   resources,
+  workflowColumns,
   compact = false,
   dragHandleProps,
   isDragging = false,
@@ -396,7 +431,10 @@ function TaskCard({
     ? Math.round((completedSubtasks / task.subtasks.length) * 100)
     : 0
   const linkedResources = resourceCountForEntity(resources, 'task', task.id)
-  const overdue = isPastDate(task.dueDate) && task.status !== 'done'
+  const workflowColumn = getTaskWorkflowColumn(task, workflowColumns)
+  const overdue = isPastDate(task.dueDate) && !isTaskCompletedByWorkflow(task, workflowColumns)
+  const isBlocked = isTaskBlockedByWorkflow(task, workflowColumns)
+  const isCompleted = isTaskCompletedByWorkflow(task, workflowColumns)
 
   return (
     <article
@@ -437,8 +475,8 @@ function TaskCard({
         </Badge>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
-        <Badge tone={task.status === 'blocked' ? 'red' : task.status === 'done' ? 'green' : 'blue'}>
-          {taskStatusLabels[task.status]}
+        <Badge tone={isBlocked ? 'red' : isCompleted ? 'green' : workflowColumn?.type === 'review' ? 'purple' : 'blue'}>
+          {workflowColumn?.name ?? taskStatusLabels[task.status]}
         </Badge>
         {overdue ? <Badge tone="red">Overdue</Badge> : null}
         {milestone ? (

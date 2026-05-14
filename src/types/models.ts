@@ -14,6 +14,7 @@ export type LinkedEntityType = 'project' | 'milestone' | 'task' | 'issue' | 'not
 export type ThemePreference = 'system' | 'light' | 'dark'
 export type DefaultView = 'dashboard' | 'focus'
 export type PathHealth = 'available' | 'missing' | 'unknown'
+export type WorkflowColumnType = 'todo' | 'active' | 'review' | 'blocked' | 'done' | 'custom'
 
 export interface Project {
   id: string
@@ -58,6 +59,7 @@ export interface Task {
   title: string
   description: string
   status: TaskStatus
+  columnId?: string
   priority: TaskPriority
   color?: ColorToken
   dueDate: string
@@ -115,9 +117,23 @@ export interface AppSettings {
   lastOpenedProjectId?: string
 }
 
+export interface WorkflowColumn {
+  id: string
+  projectId: string
+  name: string
+  color?: ColorToken
+  order: number
+  type: WorkflowColumnType
+  isCompleted: boolean
+  isDefault?: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface AppData {
   version: 1
   projects: Project[]
+  workflowColumns: WorkflowColumn[]
   milestones: Milestone[]
   tasks: Task[]
   issues: Issue[]
@@ -152,6 +168,7 @@ export interface TaskFormValues {
   title: string
   description: string
   status: TaskStatus
+  columnId?: string
   priority: TaskPriority
   color?: ColorToken
   dueDate: string
@@ -186,4 +203,93 @@ export interface ResourceFormValues {
   description?: string
   color?: ColorToken
   tags: string[]
+}
+
+export interface WorkflowColumnFormValues {
+  name: string
+  color?: ColorToken
+  type: WorkflowColumnType
+  isCompleted: boolean
+}
+
+export interface WorkflowTemplateColumn {
+  id: string
+  name: string
+  color?: ColorToken
+  order: number
+  type: WorkflowColumnType
+  isCompleted?: boolean
+}
+
+export interface WorkflowTemplate {
+  id: string
+  name: string
+  description: string
+  columns: WorkflowTemplateColumn[]
+}
+
+export interface TemplateMilestone {
+  id: string
+  title: string
+  description?: string
+  order: number
+  color?: ColorToken
+}
+
+export interface TemplateTask {
+  id: string
+  title: string
+  description?: string
+  milestoneTemplateId?: string
+  columnId?: string
+  priority?: TaskPriority
+  tags?: string[]
+  color?: ColorToken
+}
+
+export interface TemplateIssue {
+  id: string
+  title: string
+  description?: string
+  severity?: IssueSeverity
+  color?: ColorToken
+}
+
+export interface TemplateNote {
+  id: string
+  title: string
+  content: string
+  color?: ColorToken
+}
+
+export interface ProjectTemplate {
+  id: string
+  name: string
+  description: string
+  category: string
+  defaultGoal?: string
+  workflowTemplateId?: string
+  folderTemplateId?: string
+  milestones: TemplateMilestone[]
+  tasks: TemplateTask[]
+  issues?: TemplateIssue[]
+  notes?: TemplateNote[]
+  color?: ColorToken
+}
+
+export interface FolderTemplateItem {
+  id: string
+  name: string
+  path: string
+  linkedEntityHint?: 'project' | 'milestone' | 'resource'
+  milestoneTemplateId?: string
+  description?: string
+  color?: ColorToken
+}
+
+export interface FolderTemplate {
+  id: string
+  name: string
+  description: string
+  folders: FolderTemplateItem[]
 }

@@ -2,6 +2,17 @@
 
 All meaningful fixes, additions, and release packaging changes should include an appropriate version bump across `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and visible app/version docs.
 
+## 1.3.0 - 2026-05-14
+
+- Added built-in project templates for blank projects, student work, research papers, client websites, software/app development, event planning, content calendars, freelance client work, and home/personal projects.
+- Added per-project custom task workflow columns with add, rename, reorder, recolor, completed-column rules, safe deletion, and workflow template application.
+- Added global and project Calendar views for project deadlines, milestone due dates, and task due dates.
+- Added a project Timeline view for project start/due dates, milestones, scheduled tasks, overdue work, and unscheduled tasks.
+- Added desktop folder templates that safely create folders under a chosen root and link created/existing folders as PlanDesk resources.
+- Updated backup/import normalization so older data without workflow columns still loads and maps legacy task statuses safely.
+- Updated reports, dashboard, focus, progress calculations, Markdown exports, and CSV exports to use workflow completed columns.
+- Updated documentation for templates, workflows, calendar/timeline planning, folder-template safety, and v1.3.0 release artifacts.
+
 ## 1.2.0 - 2026-05-12
 
 - Added color coding for projects, milestones, tasks, issues, notes, and linked resources.

@@ -9,11 +9,13 @@ import {
   taskStatusLabels,
 } from '../types/constants'
 import type { AppData, Project, Task } from '../types/models'
+import { getProjectWorkflowColumns, getTaskWorkflowColumn } from '../data/templates'
 import { formatDate } from '../utils/date'
 import { isTauriRuntime } from './fileSystem'
 import {
   calculateMilestoneProgress,
   calculateProgress,
+  isTaskComplete,
   getProjectIssues,
   getProjectMilestones,
   getProjectNotes,
@@ -28,9 +30,9 @@ export function generateProjectMarkdown(data: AppData, project: Project) {
   const issues = getProjectIssues(data, project.id)
   const notes = getProjectNotes(data, project.id)
   const resources = getProjectResources(data, project.id)
-  const progress = calculateProgress(tasks)
-  const openTasks = tasks.filter((task) => task.status !== 'done')
-  const completedTasks = tasks.filter((task) => task.status === 'done')
+  const progress = calculateProgress(tasks, data)
+  const openTasks = tasks.filter((task) => !isTaskComplete(task, data))
+  const completedTasks = tasks.filter((task) => isTaskComplete(task, data))
   const openIssues = issues.filter((issue) => issue.status !== 'resolved')
 
   return `# ${project.name}
@@ -64,7 +66,7 @@ ${milestones.length ? milestones.map((milestone) => `- ${milestone.title}: ${mil
 
 ## Open Tasks
 
-${openTasks.length ? openTasks.map((task) => `- ${task.title}: ${taskStatusLabels[task.status]}, ${taskPriorityLabels[task.priority]}, due ${formatDate(task.dueDate)}`).join('\n') : 'No open tasks.'}
+${openTasks.length ? openTasks.map((task) => `- ${task.title}: ${taskColumnLabel(data, task)}, ${taskPriorityLabels[task.priority]}, due ${formatDate(task.dueDate)}`).join('\n') : 'No open tasks.'}
 
 ## Completed Tasks
 
@@ -88,11 +90,12 @@ ${openTasks.slice(0, 5).map((task) => `- ${task.title}`).join('\n') || '- Add th
 `
 }
 
-export function generateTaskCsv(tasks: Task[]) {
+export function generateTaskCsv(tasks: Task[], data?: AppData) {
   const rows = [
-    ['Title', 'Status', 'Priority', 'Due Date', 'Assignee', 'Tags'],
+    ['Title', 'Workflow Column', 'Legacy Status', 'Priority', 'Due Date', 'Assignee', 'Tags'],
     ...tasks.map((task) => [
       task.title,
+      data ? taskColumnLabel(data, task) : taskStatusLabels[task.status],
       taskStatusLabels[task.status],
       taskPriorityLabels[task.priority],
       task.dueDate,
@@ -106,6 +109,11 @@ export function generateTaskCsv(tasks: Task[]) {
       row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(','),
     )
     .join('\n')
+}
+
+function taskColumnLabel(data: AppData, task: Task) {
+  const columns = getProjectWorkflowColumns(data.workflowColumns, task.projectId)
+  return getTaskWorkflowColumn(task, columns)?.name ?? taskStatusLabels[task.status]
 }
 
 export type ExportFileResult = {

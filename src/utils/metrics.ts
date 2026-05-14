@@ -7,6 +7,11 @@ import type {
   ResourceLink,
   Task,
 } from '../types/models'
+import {
+  getProjectWorkflowColumns,
+  isTaskBlockedByWorkflow,
+  isTaskCompletedByWorkflow,
+} from '../data/templates'
 import { isDueToday, isPastDate, isWithinNextDays } from './date'
 
 export function getProjectTasks(data: AppData, projectId: string) {
@@ -31,24 +36,38 @@ export function getProjectResources(data: AppData, projectId: string) {
   return data.resources.filter((resource) => resource.projectId === projectId)
 }
 
-export function calculateProgress(tasks: Task[]) {
+function workflowColumnsForTask(data: AppData | undefined, task: Task) {
+  return data ? getProjectWorkflowColumns(data.workflowColumns, task.projectId) : []
+}
+
+export function isTaskComplete(task: Task, data?: AppData) {
+  const columns = workflowColumnsForTask(data, task)
+  return columns.length ? isTaskCompletedByWorkflow(task, columns) : task.status === 'done'
+}
+
+export function isTaskBlocked(task: Task, data?: AppData) {
+  const columns = workflowColumnsForTask(data, task)
+  return columns.length ? isTaskBlockedByWorkflow(task, columns) : task.status === 'blocked'
+}
+
+export function calculateProgress(tasks: Task[], data?: AppData) {
   if (tasks.length === 0) {
     return 0
   }
 
-  return Math.round((tasks.filter((task) => task.status === 'done').length / tasks.length) * 100)
+  return Math.round((tasks.filter((task) => isTaskComplete(task, data)).length / tasks.length) * 100)
 }
 
 export function calculateMilestoneProgress(data: AppData, milestoneId: string) {
-  return calculateProgress(data.tasks.filter((task) => task.milestoneId === milestoneId))
+  return calculateProgress(data.tasks.filter((task) => task.milestoneId === milestoneId), data)
 }
 
-export function isTaskOverdue(task: Task) {
-  return task.status !== 'done' && isPastDate(task.dueDate)
+export function isTaskOverdue(task: Task, data?: AppData) {
+  return !isTaskComplete(task, data) && isPastDate(task.dueDate)
 }
 
-export function isTaskDueSoon(task: Task) {
-  return task.status !== 'done' && isWithinNextDays(task.dueDate, 7)
+export function isTaskDueSoon(task: Task, data?: AppData) {
+  return !isTaskComplete(task, data) && isWithinNextDays(task.dueDate, 7)
 }
 
 export function isIssueBlocking(issue: Issue) {
@@ -60,7 +79,7 @@ export function getDashboardStats(data: AppData) {
     ['planning', 'active', 'on_hold'].includes(project.status),
   ).length
   const completedProjects = data.projects.filter((project) => project.status === 'completed').length
-  const overdueTasks = data.tasks.filter(isTaskOverdue).length
+  const overdueTasks = data.tasks.filter((task) => isTaskOverdue(task, data)).length
   const blockedIssues = data.issues.filter((issue) => issue.status !== 'resolved').length
   const missingResources = data.resources.filter((resource) => resource.isMissing).length
 
@@ -74,13 +93,13 @@ export function getDashboardStats(data: AppData) {
 }
 
 export function getFocusItems(data: AppData) {
-  const overdueTasks = data.tasks.filter(isTaskOverdue)
-  const dueToday = data.tasks.filter((task) => task.status !== 'done' && isDueToday(task.dueDate))
-  const dueThisWeek = data.tasks.filter(isTaskDueSoon)
+  const overdueTasks = data.tasks.filter((task) => isTaskOverdue(task, data))
+  const dueToday = data.tasks.filter((task) => !isTaskComplete(task, data) && isDueToday(task.dueDate))
+  const dueThisWeek = data.tasks.filter((task) => isTaskDueSoon(task, data))
   const highPriorityTasks = data.tasks.filter(
-    (task) => task.status !== 'done' && ['high', 'urgent'].includes(task.priority),
+    (task) => !isTaskComplete(task, data) && ['high', 'urgent'].includes(task.priority),
   )
-  const blockedTasks = data.tasks.filter((task) => task.status === 'blocked')
+  const blockedTasks = data.tasks.filter((task) => isTaskBlocked(task, data))
   const criticalIssues = data.issues.filter(isIssueBlocking)
   const missingResources = data.resources.filter((resource) => resource.isMissing)
 
@@ -95,8 +114,8 @@ export function getFocusItems(data: AppData) {
   }
 }
 
-export function countOpenTasks(tasks: Task[]) {
-  return tasks.filter((task) => task.status !== 'done').length
+export function countOpenTasks(tasks: Task[], data?: AppData) {
+  return tasks.filter((task) => !isTaskComplete(task, data)).length
 }
 
 export function countOpenIssues(issues: Issue[]) {

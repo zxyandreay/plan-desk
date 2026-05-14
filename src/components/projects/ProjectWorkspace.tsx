@@ -1,6 +1,8 @@
 import {
   AlertTriangle,
+  CalendarDays,
   Clipboard,
+  Clock3,
   Edit3,
   ExternalLink,
   FileText,
@@ -28,6 +30,7 @@ import {
   getProjectNotes,
   getProjectResources,
   getProjectTasks,
+  isTaskComplete,
   recentlyUpdatedItems,
 } from '../../utils/metrics'
 import { compactPath } from '../../utils/text'
@@ -43,6 +46,8 @@ import { NotesView } from '../notes/NotesView'
 import { ReportView } from '../reports/ReportView'
 import { ResourcesView } from '../resources/ResourcesView'
 import { TasksView } from '../tasks/TasksView'
+import { CalendarView } from '../calendar/CalendarView'
+import { TimelineView } from '../timeline/TimelineView'
 import { ProjectForm } from './ProjectForm'
 
 const tabs: { id: ProjectTab; label: string; icon: typeof Gauge }[] = [
@@ -52,6 +57,8 @@ const tabs: { id: ProjectTab; label: string; icon: typeof Gauge }[] = [
   { id: 'issues', label: 'Issues', icon: AlertTriangle },
   { id: 'notes', label: 'Notes', icon: NotebookText },
   { id: 'resources', label: 'Files', icon: Paperclip },
+  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+  { id: 'timeline', label: 'Timeline', icon: Clock3 },
   { id: 'report', label: 'Report', icon: FileText },
 ]
 
@@ -80,7 +87,7 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
     )
   }
 
-  const progress = calculateProgress(tasks)
+  const progress = calculateProgress(tasks, data)
   const missingRoot = project.rootFolderStatus === 'missing'
 
   const copyRoot = async () => {
@@ -117,6 +124,10 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
       <NotesView projectId={project.id} />
     ) : activeProjectTab === 'resources' ? (
       <ResourcesView projectId={project.id} />
+    ) : activeProjectTab === 'calendar' ? (
+      <CalendarView projectId={project.id} />
+    ) : activeProjectTab === 'timeline' ? (
+      <TimelineView data={data} project={project} />
     ) : activeProjectTab === 'report' ? (
       <ReportView projectId={project.id} />
     ) : (
@@ -255,7 +266,7 @@ function ProjectOverview({ projectId }: { projectId: string }) {
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <SummaryCard label="Milestones" value={`${milestones.filter((item) => item.status === 'completed').length}/${milestones.length}`} />
-          <SummaryCard label="Open tasks" value={countOpenTasks(tasks)} />
+          <SummaryCard label="Open tasks" value={countOpenTasks(tasks, data)} />
           <SummaryCard label="Open issues" value={countOpenIssues(issues)} />
           <SummaryCard label="Notes" value={notes.length} />
           <SummaryCard label="Resources" value={resources.length} />
@@ -277,7 +288,7 @@ function ProjectOverview({ projectId }: { projectId: string }) {
           <h3 className="pd-section-title">Upcoming deadlines</h3>
           <div className="mt-3 space-y-2">
             {tasks
-              .filter((task) => task.status !== 'done' && task.dueDate)
+              .filter((task) => !isTaskComplete(task, data) && task.dueDate)
               .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
               .slice(0, 5)
               .map((task) => (
@@ -291,7 +302,7 @@ function ProjectOverview({ projectId }: { projectId: string }) {
                   </div>
                 </div>
               ))}
-            {!tasks.some((task) => task.status !== 'done' && task.dueDate) ? (
+            {!tasks.some((task) => !isTaskComplete(task, data) && task.dueDate) ? (
               <p className="text-sm text-[color:var(--pd-muted-foreground)]">No upcoming task deadlines.</p>
             ) : null}
           </div>

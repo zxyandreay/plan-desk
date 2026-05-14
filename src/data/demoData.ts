@@ -1,4 +1,5 @@
 import type { AppData } from '../types/models'
+import { createWorkflowColumns, getProjectWorkflowColumns, legacyStatusToColumnId } from './templates'
 import { nowIso, todayIso } from '../utils/date'
 
 function dateOffset(days: number) {
@@ -55,6 +56,10 @@ export function createSampleData(): AppData {
       updatedAt: createdAt,
     },
   ]
+
+  const workflowColumns = projects.flatMap((project) =>
+    createWorkflowColumns(project.id, 'standard', createdAt),
+  )
 
   const milestoneSeeds = [
     {
@@ -196,6 +201,14 @@ export function createSampleData(): AppData {
     },
   ]
 
+  const tasksWithColumns = tasks.map((task) => {
+    const columns = getProjectWorkflowColumns(workflowColumns, task.projectId)
+    return {
+      ...task,
+      columnId: legacyStatusToColumnId(task.status, columns),
+    }
+  })
+
   const issues = [
     {
       id: 'demo_issue_logo',
@@ -287,8 +300,9 @@ export function createSampleData(): AppData {
   return {
     version: 1,
     projects,
+    workflowColumns,
     milestones,
-    tasks,
+    tasks: tasksWithColumns,
     issues,
     notes,
     resources,

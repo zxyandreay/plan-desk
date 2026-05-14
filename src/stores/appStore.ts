@@ -2,6 +2,14 @@ import { create } from 'zustand'
 import { createSampleData } from '../data/demoData'
 import { createEmptyData } from '../data/initialData'
 import { readAppData, saveAppData } from '../data/localRepository'
+import {
+  createWorkflowColumns,
+  getProjectTemplate,
+  getProjectWorkflowColumns,
+  legacyStatusToColumnId,
+  statusFromWorkflowColumn,
+  workflowColumnId,
+} from '../data/templates'
 import { checkPathHealth } from '../lib/fileSystem'
 import type {
   AppData,
@@ -12,12 +20,12 @@ import type {
   ProjectFormValues,
   ResourceFormValues,
   TaskFormValues,
-  TaskStatus,
+  WorkflowColumnFormValues,
 } from '../types/models'
 import { nowIso } from '../utils/date'
 import { createId } from '../utils/id'
 
-export type AppView = 'dashboard' | 'focus' | 'settings' | 'project'
+export type AppView = 'dashboard' | 'focus' | 'calendar' | 'settings' | 'project'
 export type ProjectTab =
   | 'overview'
   | 'milestones'
@@ -25,6 +33,8 @@ export type ProjectTab =
   | 'issues'
   | 'notes'
   | 'resources'
+  | 'calendar'
+  | 'timeline'
   | 'report'
 
 export type ToastTone = 'success' | 'info' | 'warning' | 'error'
@@ -33,6 +43,21 @@ export interface ToastMessage {
   id: string
   tone: ToastTone
   message: string
+}
+
+export interface CreateProjectFromTemplateInput {
+  templateId: string
+  values: ProjectFormValues
+  workflowTemplateId: string
+  applyWorkflow: boolean
+  includeTasks: boolean
+  includeIssues: boolean
+  includeNotes: boolean
+}
+
+export interface CreateProjectFromTemplateResult {
+  projectId: string
+  milestoneIdsByTemplateId: Record<string, string>
 }
 
 interface AppStore {
@@ -52,6 +77,7 @@ interface AppStore {
   setProjectTab: (tab: ProjectTab) => void
   setTaskView: (view: 'board' | 'list') => void
   createProject: (values: ProjectFormValues) => string
+  createProjectFromTemplate: (input: CreateProjectFromTemplateInput) => CreateProjectFromTemplateResult
   updateProject: (projectId: string, values: ProjectFormValues) => void
   deleteProject: (projectId: string) => void
   setProjectRoot: (projectId: string, rootFolderPath?: string) => Promise<void>
@@ -61,8 +87,13 @@ interface AppStore {
   createTask: (projectId: string, values: TaskFormValues) => void
   updateTask: (taskId: string, values: TaskFormValues) => void
   deleteTask: (taskId: string) => void
-  moveTask: (taskId: string, status: TaskStatus) => void
+  moveTask: (taskId: string, columnId: string) => void
   toggleSubtask: (taskId: string, subtaskId: string) => void
+  createWorkflowColumn: (projectId: string, values: WorkflowColumnFormValues) => void
+  updateWorkflowColumn: (columnId: string, values: WorkflowColumnFormValues) => void
+  moveWorkflowColumn: (columnId: string, direction: -1 | 1) => void
+  deleteWorkflowColumn: (columnId: string, moveToColumnId?: string) => void
+  applyWorkflowTemplate: (projectId: string, workflowTemplateId: string) => void
   createIssue: (projectId: string, values: IssueFormValues) => void
   updateIssue: (issueId: string, values: IssueFormValues) => void
   deleteIssue: (issueId: string) => void
@@ -110,6 +141,20 @@ function removeEntityResources(
     (resource) =>
       resource.linkedEntityType !== linkedEntityType || resource.linkedEntityId !== linkedEntityId,
   )
+}
+
+function taskValuesForWorkflow(data: AppData, projectId: string, values: TaskFormValues) {
+  const columns = getProjectWorkflowColumns(data.workflowColumns, projectId)
+  const columnId = values.columnId && columns.some((column) => column.id === values.columnId)
+    ? values.columnId
+    : legacyStatusToColumnId(values.status, columns)
+  const column = columns.find((item) => item.id === columnId)
+
+  return {
+    ...values,
+    columnId,
+    status: statusFromWorkflowColumn(column),
+  }
 }
 
 export const useAppStore = create<AppStore>((set, get) => {
@@ -179,6 +224,7 @@ export const useAppStore = create<AppStore>((set, get) => {
     createProject(values) {
       const timestamp = nowIso()
       const projectId = createId('project')
+      const workflowColumns = createWorkflowColumns(projectId, 'standard', timestamp)
       commit(
         (data) => ({
           ...data,
@@ -192,6 +238,7 @@ export const useAppStore = create<AppStore>((set, get) => {
             },
             ...data.projects,
           ],
+          workflowColumns: [...data.workflowColumns, ...workflowColumns],
           settings: {
             ...data.settings,
             lastOpenedProjectId: projectId,
@@ -202,6 +249,124 @@ export const useAppStore = create<AppStore>((set, get) => {
       set({ activeProjectId: projectId, activeView: 'project', activeProjectTab: 'overview' })
       void get().refreshResourceHealth()
       return projectId
+    },
+    createProjectFromTemplate(input) {
+      const timestamp = nowIso()
+      const template = getProjectTemplate(input.templateId)
+      const projectId = createId('project')
+      const workflowTemplateId = input.applyWorkflow
+        ? input.workflowTemplateId || template.workflowTemplateId || 'standard'
+        : 'standard'
+      const workflowColumns = createWorkflowColumns(projectId, workflowTemplateId, timestamp)
+      const firstColumnId = workflowColumns[0]?.id
+      const milestoneIdsByTemplateId: Record<string, string> = {}
+
+      const milestones = template.milestones.map((milestone) => {
+        const milestoneId = createId('milestone')
+        milestoneIdsByTemplateId[milestone.id] = milestoneId
+        return {
+          id: milestoneId,
+          projectId,
+          title: milestone.title,
+          description: milestone.description ?? '',
+          status: 'not_started' as const,
+          color: milestone.color,
+          dueDate: '',
+          order: milestone.order,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        }
+      })
+
+      const tasks = input.includeTasks
+        ? template.tasks.map((task) => {
+            const requestedColumnId = task.columnId
+              ? workflowColumnId(projectId, task.columnId)
+              : undefined
+            const column =
+              workflowColumns.find((item) => item.id === requestedColumnId) ??
+              workflowColumns.find((item) => item.type === 'todo') ??
+              workflowColumns[0]
+
+            return {
+              id: createId('task'),
+              projectId,
+              milestoneId: task.milestoneTemplateId
+                ? milestoneIdsByTemplateId[task.milestoneTemplateId]
+                : undefined,
+              title: task.title,
+              description: task.description ?? '',
+              status: statusFromWorkflowColumn(column),
+              columnId: column?.id ?? firstColumnId,
+              priority: task.priority ?? 'medium',
+              color: task.color,
+              dueDate: '',
+              assignee: undefined,
+              tags: task.tags ?? [],
+              subtasks: [],
+              createdAt: timestamp,
+              updatedAt: timestamp,
+            }
+          })
+        : []
+
+      const issues = input.includeIssues
+        ? (template.issues ?? []).map((issue) => ({
+            id: createId('issue'),
+            projectId,
+            relatedTaskId: undefined,
+            title: issue.title,
+            description: issue.description ?? '',
+            severity: issue.severity ?? 'medium',
+            status: 'open' as const,
+            color: issue.color,
+            resolutionNotes: '',
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }))
+        : []
+
+      const notes = input.includeNotes
+        ? (template.notes ?? []).map((note) => ({
+            id: createId('note'),
+            projectId,
+            title: note.title,
+            content: note.content,
+            color: note.color,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }))
+        : []
+
+      commit(
+        (data) => ({
+          ...data,
+          projects: [
+            {
+              id: projectId,
+              ...input.values,
+              color: input.values.color ?? template.color,
+              rootFolderStatus: input.values.rootFolderPath ? 'unknown' : undefined,
+              createdAt: timestamp,
+              updatedAt: timestamp,
+            },
+            ...data.projects,
+          ],
+          workflowColumns: [...data.workflowColumns, ...workflowColumns],
+          milestones: [...data.milestones, ...milestones],
+          tasks: [...tasks, ...data.tasks],
+          issues: [...issues, ...data.issues],
+          notes: [...notes, ...data.notes],
+          settings: {
+            ...data.settings,
+            lastOpenedProjectId: projectId,
+          },
+        }),
+        { tone: 'success', message: template.id === 'blank' ? 'Blank project created.' : 'Project created from template.' },
+      )
+      set({ activeProjectId: projectId, activeView: 'project', activeProjectTab: 'overview' })
+      void get().refreshResourceHealth()
+      return { projectId, milestoneIdsByTemplateId }
     },
     updateProject(projectId, values) {
       const timestamp = nowIso()
@@ -228,6 +393,7 @@ export const useAppStore = create<AppStore>((set, get) => {
         (data) => ({
           ...data,
           projects: data.projects.filter((project) => project.id !== projectId),
+          workflowColumns: data.workflowColumns.filter((column) => column.projectId !== projectId),
           milestones: data.milestones.filter((milestone) => milestone.projectId !== projectId),
           tasks: data.tasks.filter((task) => task.projectId !== projectId),
           issues: data.issues.filter((issue) => issue.projectId !== projectId),
@@ -344,7 +510,7 @@ export const useAppStore = create<AppStore>((set, get) => {
                 {
                   id: createId('task'),
                   projectId,
-                  ...values,
+                  ...taskValuesForWorkflow(data, projectId, values),
                   createdAt: timestamp,
                   updatedAt: timestamp,
                 },
@@ -370,7 +536,9 @@ export const useAppStore = create<AppStore>((set, get) => {
             {
               ...data,
               tasks: data.tasks.map((item) =>
-                item.id === taskId ? { ...item, ...values, updatedAt: timestamp } : item,
+                item.id === taskId
+                  ? { ...item, ...taskValuesForWorkflow(data, item.projectId, values), updatedAt: timestamp }
+                  : item,
               ),
             },
             task.projectId,
@@ -405,7 +573,7 @@ export const useAppStore = create<AppStore>((set, get) => {
         { tone: 'warning', message: 'Task deleted. Linked files were not touched.' },
       )
     },
-    moveTask(taskId, status) {
+    moveTask(taskId, columnId) {
       const timestamp = nowIso()
       const task = get().data.tasks.find((item) => item.id === taskId)
       if (!task) {
@@ -417,7 +585,18 @@ export const useAppStore = create<AppStore>((set, get) => {
           {
             ...data,
             tasks: data.tasks.map((item) =>
-              item.id === taskId ? { ...item, status, updatedAt: timestamp } : item,
+              item.id === taskId
+                ? {
+                    ...item,
+                    columnId,
+                    status: statusFromWorkflowColumn(
+                      getProjectWorkflowColumns(data.workflowColumns, item.projectId).find(
+                        (column) => column.id === columnId,
+                      ),
+                    ),
+                    updatedAt: timestamp,
+                  }
+                : item,
             ),
           },
           task.projectId,
@@ -453,6 +632,198 @@ export const useAppStore = create<AppStore>((set, get) => {
           task.projectId,
           timestamp,
         ),
+      )
+    },
+    createWorkflowColumn(projectId, values) {
+      const timestamp = nowIso()
+      commit(
+        (data) =>
+          touchProject(
+            {
+              ...data,
+              workflowColumns: [
+                ...data.workflowColumns,
+                {
+                  id: createId('workflow'),
+                  projectId,
+                  ...values,
+                  type: values.isCompleted ? 'done' : values.type,
+                  order: getProjectWorkflowColumns(data.workflowColumns, projectId).length,
+                  createdAt: timestamp,
+                  updatedAt: timestamp,
+                },
+              ],
+            },
+            projectId,
+            timestamp,
+          ),
+        { tone: 'success', message: 'Workflow column added.' },
+      )
+    },
+    updateWorkflowColumn(columnId, values) {
+      const timestamp = nowIso()
+      const column = get().data.workflowColumns.find((item) => item.id === columnId)
+      if (!column) {
+        return
+      }
+
+      const projectColumns = getProjectWorkflowColumns(get().data.workflowColumns, column.projectId)
+      const wouldRemoveLastCompleted =
+        column.isCompleted &&
+        !values.isCompleted &&
+        projectColumns.filter((item) => item.id !== columnId).every((item) => !item.isCompleted)
+
+      if (wouldRemoveLastCompleted) {
+        get().showToast('At least one workflow column must count as completed.', 'warning')
+        return
+      }
+
+      commit(
+        (data) =>
+          touchProject(
+            {
+              ...data,
+              workflowColumns: data.workflowColumns.map((item) =>
+                item.id === columnId
+                  ? {
+                      ...item,
+                      ...values,
+                      type: values.isCompleted ? 'done' : values.type,
+                      updatedAt: timestamp,
+                    }
+                  : item,
+              ),
+              tasks: data.tasks.map((task) => {
+                if (task.columnId !== columnId) return task
+                const nextColumn = {
+                  ...column,
+                  ...values,
+                  type: values.isCompleted ? 'done' : values.type,
+                }
+                return { ...task, status: statusFromWorkflowColumn(nextColumn), updatedAt: timestamp }
+              }),
+            },
+            column.projectId,
+            timestamp,
+          ),
+        { tone: 'success', message: 'Workflow column updated.' },
+      )
+    },
+    moveWorkflowColumn(columnId, direction) {
+      const timestamp = nowIso()
+      const column = get().data.workflowColumns.find((item) => item.id === columnId)
+      if (!column) {
+        return
+      }
+
+      const columns = getProjectWorkflowColumns(get().data.workflowColumns, column.projectId)
+      const currentIndex = columns.findIndex((item) => item.id === columnId)
+      const nextIndex = currentIndex + direction
+      if (nextIndex < 0 || nextIndex >= columns.length) {
+        return
+      }
+
+      const reordered = [...columns]
+      const [moved] = reordered.splice(currentIndex, 1)
+      reordered.splice(nextIndex, 0, moved)
+      const orderById = new Map(reordered.map((item, index) => [item.id, index]))
+
+      commit((data) =>
+        touchProject(
+          {
+            ...data,
+            workflowColumns: data.workflowColumns.map((item) =>
+              orderById.has(item.id)
+                ? { ...item, order: orderById.get(item.id) ?? item.order, updatedAt: timestamp }
+                : item,
+            ),
+          },
+          column.projectId,
+          timestamp,
+        ),
+      )
+    },
+    deleteWorkflowColumn(columnId, moveToColumnId) {
+      const timestamp = nowIso()
+      const column = get().data.workflowColumns.find((item) => item.id === columnId)
+      if (!column) {
+        return
+      }
+
+      const data = get().data
+      const columns = getProjectWorkflowColumns(data.workflowColumns, column.projectId)
+      const tasksInColumn = data.tasks.filter((task) => task.columnId === columnId)
+      const targetColumn = columns.find((item) => item.id === moveToColumnId)
+      const remainingColumns = columns.filter((item) => item.id !== columnId)
+
+      if (tasksInColumn.length && !targetColumn) {
+        get().showToast('Choose another column before deleting a column that contains tasks.', 'warning')
+        return
+      }
+
+      if (!remainingColumns.some((item) => item.isCompleted || item.type === 'done')) {
+        get().showToast('At least one workflow column must count as completed.', 'warning')
+        return
+      }
+
+      const orderById = new Map(remainingColumns.map((item, index) => [item.id, index]))
+      commit(
+        (currentData) =>
+          touchProject(
+            {
+              ...currentData,
+              workflowColumns: currentData.workflowColumns
+                .filter((item) => item.id !== columnId)
+                .map((item) =>
+                  orderById.has(item.id)
+                    ? { ...item, order: orderById.get(item.id) ?? item.order, updatedAt: timestamp }
+                    : item,
+                ),
+              tasks: currentData.tasks.map((task) =>
+                task.columnId === columnId && targetColumn
+                  ? {
+                      ...task,
+                      columnId: targetColumn.id,
+                      status: statusFromWorkflowColumn(targetColumn),
+                      updatedAt: timestamp,
+                    }
+                  : task,
+              ),
+            },
+            column.projectId,
+            timestamp,
+          ),
+        { tone: 'warning', message: 'Workflow column deleted. Tasks were kept.' },
+      )
+    },
+    applyWorkflowTemplate(projectId, workflowTemplateId) {
+      const timestamp = nowIso()
+      const workflowColumns = createWorkflowColumns(projectId, workflowTemplateId, timestamp)
+      commit(
+        (data) =>
+          touchProject(
+            {
+              ...data,
+              workflowColumns: [
+                ...data.workflowColumns.filter((column) => column.projectId !== projectId),
+                ...workflowColumns,
+              ],
+              tasks: data.tasks.map((task) => {
+                if (task.projectId !== projectId) return task
+                const columnId = legacyStatusToColumnId(task.status, workflowColumns) ?? workflowColumns[0]?.id
+                const column = workflowColumns.find((item) => item.id === columnId)
+                return {
+                  ...task,
+                  columnId,
+                  status: statusFromWorkflowColumn(column),
+                  updatedAt: timestamp,
+                }
+              }),
+            },
+            projectId,
+            timestamp,
+          ),
+        { tone: 'success', message: 'Workflow template applied.' },
       )
     },
     createIssue(projectId, values) {

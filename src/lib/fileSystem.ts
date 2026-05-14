@@ -5,6 +5,25 @@ type ActionResult = {
   message: string
 }
 
+export interface FolderCreateRequestItem {
+  id: string
+  name: string
+  path: string
+}
+
+export interface FolderCreateResultItem {
+  id: string
+  name: string
+  relativePath: string
+  path: string
+  status: 'created' | 'existing' | 'failed'
+  message?: string
+}
+
+export interface FolderCreateResult extends ActionResult {
+  results: FolderCreateResultItem[]
+}
+
 export function isTauriRuntime() {
   return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 }
@@ -151,4 +170,44 @@ export async function checkPathHealth(path: string): Promise<PathHealth> {
 
 export async function choosePathForType(type: ResourceType) {
   return type === 'folder' ? chooseFolder() : chooseFile()
+}
+
+export async function createDirectoriesFromTemplate(
+  rootPath: string,
+  folders: FolderCreateRequestItem[],
+): Promise<FolderCreateResult> {
+  if (!isTauriRuntime()) {
+    return {
+      ok: false,
+      message:
+        'Folder template creation is available in the desktop app. Browser preview mode can only store folder paths as references.',
+      results: [],
+    }
+  }
+
+  try {
+    const { invoke } = await import('@tauri-apps/api/core')
+    const results = await invoke<FolderCreateResultItem[]>('create_directories', {
+      rootPath,
+      folders: folders.map((folder) => ({
+        id: folder.id,
+        name: folder.name,
+        relativePath: folder.path,
+      })),
+    })
+    const failedCount = results.filter((result) => result.status === 'failed').length
+    return {
+      ok: failedCount === 0,
+      message: failedCount
+        ? `Folder template finished with ${failedCount} issue${failedCount === 1 ? '' : 's'}.`
+        : 'Folder template created and checked.',
+      results,
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Could not create folder template.',
+      results: [],
+    }
+  }
 }

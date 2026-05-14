@@ -61,7 +61,7 @@ export function ReportView({ projectId }: ReportViewProps) {
           <Button
             icon={<Table className="h-4 w-4" />}
             onClick={() =>
-              void exportFile(`${safeName || 'project'}-tasks.csv`, generateTaskCsv(tasks), 'text/csv')
+              void exportFile(`${safeName || 'project'}-tasks.csv`, generateTaskCsv(tasks, data), 'text/csv')
             }
           >
             CSV tasks

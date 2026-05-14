@@ -9,8 +9,12 @@ It is Windows-first through Tauri, React, and TypeScript, with a portable archit
 ## Features
 
 - Dashboard with project cards, progress, due-soon work, recent projects, and attention counts.
-- Project workspaces with Overview, Milestones, Tasks, Issues, Notes, Files / Resources, and Report views.
+- Project workspaces with Overview, Milestones, Tasks, Issues, Notes, Files / Resources, Calendar, Timeline, and Report views.
 - CRUD for projects, milestones, tasks, issues, notes, and resource links.
+- Built-in project templates for student work, research papers, client websites, software/app development, event planning, content calendars, freelance client work, and home/personal projects.
+- Per-project custom task workflows with editable columns, column colors, ordering, completion rules, and workflow templates.
+- Calendar and timeline views for project deadlines, milestone due dates, task due dates, project phases, overdue work, and unscheduled items.
+- Folder templates that can create organized local folder structures from the desktop app after explicit confirmation.
 - Color-coded projects, milestones, tasks, issues, notes, and resources for subtle visual organization.
 - Task board and list views, including drag-and-drop status changes on a horizontally scrollable kanban board.
 - Improved desktop board readability with fixed-width columns, clearer task cards, and intentional empty columns.
@@ -36,6 +40,30 @@ Resource links support labels, descriptions, tags, linked section/entity, path h
 In the Tauri desktop app, native file/folder pickers and open/reveal actions are handled through Tauri plugins. In the Vite browser preview, PlanDesk safely falls back to manual path entry and clipboard support where the browser allows it.
 
 PlanDesk never recursively scans your computer and never modifies linked files or folders.
+
+## Project Templates
+
+PlanDesk includes built-in project templates for common workflows, including Blank Project, Student Project, Research Paper, Client Website, Software/App Development, Event Planning, Content Calendar, Freelance Client Work, and Home / Personal Project.
+
+Templates can generate milestones, tasks, issues, notes, workflow columns, color accents, and optional folder template recommendations. Blank Project remains available when you want to start from scratch.
+
+## Custom Workflows
+
+Each project can have its own task workflow columns. Columns can be added, renamed, reordered, recolored, marked as completed, and safely removed after tasks are moved to another column.
+
+Built-in workflow templates include Standard, Simple, Student, Design, Content, Client Work, Event Planning, and Software Development. Progress calculations use columns marked as completed, so workflows are not locked to a single hardcoded "Done" status.
+
+## Calendar And Timeline
+
+The global Calendar view shows dated project deadlines, milestone due dates, and task due dates across all projects. Project workspaces also include Calendar and Timeline tabs for project-specific schedule planning.
+
+Timeline view shows project start/due dates, milestones in order, dated tasks under each phase, overdue/upcoming state, and unscheduled tasks that still need dates.
+
+## Folder Templates
+
+Folder templates help create organized local folder structures such as Documents / Resources / Outputs, Client Website folders, Software/App Development folders, Student Project folders, and more.
+
+Folder templates are desktop-only actions. PlanDesk creates folders only after explicit confirmation, never overwrites files, and links created or existing folders as PlanDesk resource references. Backups store paths only; actual folder contents are not copied.
 
 ## Screenshots
 
@@ -111,12 +139,12 @@ The build script runs install, typecheck, lint, and Tauri's NSIS build. It copie
 
 ```text
 release/
-  PlanDesk_1.2.0_x64-setup.exe
-  PlanDesk_1.2.0_x64.exe
+  PlanDesk_1.3.0_x64-setup.exe
+  PlanDesk_1.3.0_x64.exe
   PlanDesk.exe
 ```
 
-Use `PlanDesk_1.2.0_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk_1.2.0_x64.exe` or `PlanDesk.exe` when you want to launch the built app directly from the release folder.
+Use `PlanDesk_1.3.0_x64-setup.exe` when you want a normal Windows installer and Start Menu shortcut. Use `PlanDesk_1.3.0_x64.exe` or `PlanDesk.exe` when you want to launch the built app directly from the release folder.
 
 Tauri uses Microsoft WebView2 internally to render the app window, but PlanDesk opens like a normal desktop app. No browser tab or Vite dev server is needed after building.
 
@@ -145,6 +173,7 @@ PlanDesk stores app data locally in IndexedDB under a single versioned snapshot.
 Stored records include:
 
 - Projects
+- Workflow columns
 - Milestones
 - Tasks and subtasks
 - Issues
@@ -166,6 +195,7 @@ On import, PlanDesk validates the backup shape with Zod and asks for confirmatio
 src/
   app/
   components/
+    calendar/
     dashboard/
     focus/
     issues/
@@ -177,6 +207,7 @@ src/
     resources/
     settings/
     tasks/
+    timeline/
     ui/
   data/
   hooks/
@@ -191,7 +222,6 @@ src-tauri/
 
 - SQLite storage backend for packaged desktop builds.
 - Activity history.
-- Project templates.
 - PDF export.
 - Optional shallow folder preview for direct child counts.
 - Keyboard shortcuts for common creation and navigation actions.
@@ -207,7 +237,7 @@ vX.Y.Z
 Example:
 
 ```text
-v1.2.0
+v1.3.0
 ```
 
 Every official release should include an updated app version, release commit, annotated Git tag, rebuilt Windows installer, GitHub Release notes, and uploaded installer artifacts.

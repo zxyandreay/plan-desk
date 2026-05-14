@@ -25,6 +25,7 @@ Examples:
 - `v1.1.0`
 - `v1.1.1`
 - `v1.1.2`
+- `v1.3.0`
 
 Use annotated tags only:
 
@@ -55,7 +56,7 @@ Examples:
 
 - `Release v1.1.1: apply PlanDesk app icons`
 - `Release v1.1.2: fix Windows release icons`
-- `Release v1.2.0: add project templates`
+- `Release v1.3.0: add templates, custom workflows, calendar, and folder templates`
 
 For normal non-release commits, use clear conventional-style messages when practical:
 
@@ -107,4 +108,5 @@ Keep these app version references aligned:
 | 1.1.1 | v1.1.1 | Patch | PlanDesk app and installer icon release. | Reconstructed from commit `b34954c` |
 | 1.1.2 | v1.1.2 | Patch | Windows release icon and versioned EXE release; release workflow organization. | Existing |
 | 1.1.3 | v1.1.3 | Patch | Report export and backup download fix release. | Existing |
-| 1.2.0 | v1.2.0 | Minor | Color coding and kanban board layout improvement release. | Current release |
+| 1.2.0 | v1.2.0 | Minor | Color coding and kanban board layout improvement release. | Existing |
+| 1.3.0 | v1.3.0 | Minor | Project templates, custom workflows, calendar, timeline, and folder template release. | Current release |

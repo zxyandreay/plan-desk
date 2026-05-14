@@ -1,7 +1,6 @@
 import { AlertTriangle, CalendarClock, CheckCircle2, FolderCheck, FolderOpen, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { projectPriorityLabels, projectStatusLabels } from '../../types/constants'
-import type { ProjectFormValues } from '../../types/models'
 import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
 import {
@@ -20,11 +19,10 @@ import { Button } from '../ui/Button'
 import { EmptyState } from '../ui/EmptyState'
 import { Modal } from '../ui/Modal'
 import { ProgressBar } from '../ui/ProgressBar'
-import { ProjectForm } from '../projects/ProjectForm'
+import { ProjectTemplateWizard } from '../projects/ProjectTemplateWizard'
 
 export function Dashboard() {
   const data = useAppStore((state) => state.data)
-  const createProject = useAppStore((state) => state.createProject)
   const setActiveProject = useAppStore((state) => state.setActiveProject)
   const loadSampleData = useAppStore((state) => state.loadSampleData)
   const [query, setQuery] = useState('')
@@ -32,7 +30,7 @@ export function Dashboard() {
   const [isProjectModalOpen, setProjectModalOpen] = useState(false)
 
   const stats = getDashboardStats(data)
-  const dueSoon = data.tasks.filter(isTaskDueSoon).slice(0, 8)
+  const dueSoon = data.tasks.filter((task) => isTaskDueSoon(task, data)).slice(0, 8)
   const recentProjects = data.projects
     .slice()
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
@@ -49,11 +47,6 @@ export function Dashboard() {
       return matchesText && matchesStatus
     })
   }, [data.projects, query, statusFilter])
-
-  const submitProject = (values: ProjectFormValues) => {
-    createProject(values)
-    setProjectModalOpen(false)
-  }
 
   return (
     <div className="pd-page space-y-6">
@@ -136,7 +129,7 @@ export function Dashboard() {
                     const tasks = getProjectTasks(data, project.id)
                     const issues = getProjectIssues(data, project.id)
                     const resources = getProjectResources(data, project.id)
-                    const progress = calculateProgress(tasks)
+                    const progress = calculateProgress(tasks, data)
                     return (
                       <button
                         key={project.id}
@@ -168,7 +161,7 @@ export function Dashboard() {
                           <ProgressBar value={progress} label={`${progress}% complete`} />
                         </div>
                         <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-[color:var(--pd-muted-foreground)]">
-                          <span>{countOpenTasks(tasks)} open tasks</span>
+                          <span>{countOpenTasks(tasks, data)} open tasks</span>
                           <span>{countOpenIssues(issues)} open issues</span>
                           <span>{resources.length} resources</span>
                         </div>
@@ -236,7 +229,10 @@ export function Dashboard() {
       )}
 
       <Modal title="Create project" isOpen={isProjectModalOpen} onClose={() => setProjectModalOpen(false)}>
-        <ProjectForm onCancel={() => setProjectModalOpen(false)} onSubmit={submitProject} />
+        <ProjectTemplateWizard
+          onCancel={() => setProjectModalOpen(false)}
+          onCreated={() => setProjectModalOpen(false)}
+        />
       </Modal>
     </div>
   )

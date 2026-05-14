@@ -1,4 +1,4 @@
-import { FilePlus2, FolderPlus, RefreshCcw, Search } from 'lucide-react'
+import { FilePlus2, FolderPlus, FolderTree, RefreshCcw, Search } from 'lucide-react'
 import { useState } from 'react'
 import { useAppStore } from '../../stores/appStore'
 import { linkedEntityLabels, linkedEntityTypes, resourceTypeLabels } from '../../types/constants'
@@ -6,6 +6,7 @@ import type { LinkedEntityType, ResourceFormValues, ResourceLink, ResourceType }
 import { Button } from '../ui/Button'
 import { ConfirmDialog } from '../ui/ConfirmDialog'
 import { Modal } from '../ui/Modal'
+import { FolderTemplateDialog } from './FolderTemplateDialog'
 import { ResourceForm } from './ResourceForm'
 import { ResourceList } from './ResourceList'
 
@@ -22,6 +23,7 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
   const [editingResource, setEditingResource] = useState<ResourceLink | undefined>()
   const [deletingResource, setDeletingResource] = useState<ResourceLink | undefined>()
   const [isResourceModalOpen, setResourceModalOpen] = useState(false)
+  const [isFolderTemplateOpen, setFolderTemplateOpen] = useState(false)
   const [defaultType, setDefaultType] = useState<ResourceType>('folder')
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<'all' | ResourceType>('all')
@@ -77,6 +79,9 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
         <div className="flex flex-wrap gap-2">
           <Button icon={<RefreshCcw className="h-4 w-4" />} onClick={() => void refreshResourceHealth()}>
             Check paths
+          </Button>
+          <Button icon={<FolderTree className="h-4 w-4" />} onClick={() => setFolderTemplateOpen(true)}>
+            Folder template
           </Button>
           <Button icon={<FolderPlus className="h-4 w-4" />} onClick={() => openAdd('folder')}>
             Add folder
@@ -184,6 +189,14 @@ export function ResourcesView({ projectId }: ResourcesViewProps) {
           }}
           onSubmit={submitResource}
         />
+      </Modal>
+      <Modal
+        title="Apply folder template"
+        description="Create missing folders under a chosen root and link them as PlanDesk resources."
+        isOpen={isFolderTemplateOpen}
+        onClose={() => setFolderTemplateOpen(false)}
+      >
+        <FolderTemplateDialog projectId={projectId} onClose={() => setFolderTemplateOpen(false)} />
       </Modal>
       <ConfirmDialog
         title="Remove resource link"

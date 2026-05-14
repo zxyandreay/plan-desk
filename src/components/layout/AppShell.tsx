@@ -1,15 +1,14 @@
-import { CalendarClock, FolderKanban, Gauge, Plus, Search, Settings } from 'lucide-react'
+import { CalendarDays, CalendarClock, FolderKanban, Gauge, Plus, Search, Settings } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 import { cn } from '../../lib/cn'
 import { useAppStore, type AppView } from '../../stores/appStore'
 import { projectStatusLabels } from '../../types/constants'
-import type { ProjectFormValues } from '../../types/models'
 import { colorClass } from '../../utils/colors'
 import { calculateProgress, getProjectTasks } from '../../utils/metrics'
 import { Button } from '../ui/Button'
 import { Modal } from '../ui/Modal'
-import { ProjectForm } from '../projects/ProjectForm'
+import { ProjectTemplateWizard } from '../projects/ProjectTemplateWizard'
 
 interface AppShellProps {
   children: ReactNode
@@ -18,6 +17,7 @@ interface AppShellProps {
 const navItems: { id: AppView; label: string; icon: typeof Gauge }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Gauge },
   { id: 'focus', label: 'Focus', icon: CalendarClock },
+  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
   { id: 'settings', label: 'Settings', icon: Settings },
 ]
 
@@ -27,7 +27,6 @@ export function AppShell({ children }: AppShellProps) {
   const activeProjectId = useAppStore((state) => state.activeProjectId)
   const setActiveView = useAppStore((state) => state.setActiveView)
   const setActiveProject = useAppStore((state) => state.setActiveProject)
-  const createProject = useAppStore((state) => state.createProject)
   const isSaving = useAppStore((state) => state.isSaving)
   const [isProjectModalOpen, setProjectModalOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -45,11 +44,6 @@ export function AppShell({ children }: AppShellProps) {
         .includes(normalized),
     )
   }, [data.projects, query])
-
-  const submitProject = (values: ProjectFormValues) => {
-    createProject(values)
-    setProjectModalOpen(false)
-  }
 
   return (
     <div className="pd-app flex h-screen">
@@ -112,7 +106,7 @@ export function AppShell({ children }: AppShellProps) {
           </div>
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 scrollbar-thin">
             {filteredProjects.map((project) => {
-              const progress = calculateProgress(getProjectTasks(data, project.id))
+              const progress = calculateProgress(getProjectTasks(data, project.id), data)
               const active = activeView === 'project' && activeProjectId === project.id
               return (
                 <button
@@ -159,11 +153,14 @@ export function AppShell({ children }: AppShellProps) {
       <main className="min-w-0 flex-1 overflow-y-auto scrollbar-thin">{children}</main>
       <Modal
         title="Create project"
-        description="Start with the goal and optionally link a root folder."
+        description="Start clean or use a template for milestones, tasks, workflows, and folders."
         isOpen={isProjectModalOpen}
         onClose={() => setProjectModalOpen(false)}
       >
-        <ProjectForm onCancel={() => setProjectModalOpen(false)} onSubmit={submitProject} />
+        <ProjectTemplateWizard
+          onCancel={() => setProjectModalOpen(false)}
+          onCreated={() => setProjectModalOpen(false)}
+        />
       </Modal>
     </div>
   )

@@ -5,7 +5,7 @@ import { milestoneStatusLabels } from '../../types/constants'
 import type { Milestone, MilestoneFormValues, ResourceFormValues } from '../../types/models'
 import { colorClass } from '../../utils/colors'
 import { formatDate } from '../../utils/date'
-import { calculateMilestoneProgress, resourceCountForEntity } from '../../utils/metrics'
+import { calculateMilestoneProgress, isTaskComplete, resourceCountForEntity } from '../../utils/metrics'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { ConfirmDialog } from '../ui/ConfirmDialog'
@@ -76,7 +76,7 @@ export function MilestonesView({ projectId }: MilestonesViewProps) {
         <div className="grid gap-4 xl:grid-cols-2">
           {milestones.map((milestone) => {
             const milestoneTasks = tasks.filter((task) => task.milestoneId === milestone.id)
-            const completed = milestoneTasks.filter((task) => task.status === 'done').length
+            const completed = milestoneTasks.filter((task) => isTaskComplete(task, data)).length
             const progress = calculateMilestoneProgress(data, milestone.id)
             const linkedResources = resourceCountForEntity(resources, 'milestone', milestone.id)
             return (

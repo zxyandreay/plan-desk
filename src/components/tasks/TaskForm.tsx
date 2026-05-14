@@ -1,7 +1,8 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { taskPriorities, taskPriorityLabels, taskStatuses, taskStatusLabels } from '../../types/constants'
-import type { Milestone, Subtask, Task, TaskFormValues } from '../../types/models'
+import { statusFromWorkflowColumn } from '../../data/templates'
+import { taskPriorities, taskPriorityLabels } from '../../types/constants'
+import type { Milestone, Subtask, Task, TaskFormValues, WorkflowColumn } from '../../types/models'
 import { createId } from '../../utils/id'
 import { joinTags, splitTags } from '../../utils/text'
 import { Button } from '../ui/Button'
@@ -11,15 +12,19 @@ import { SelectField, TextAreaField, TextField } from '../ui/Field'
 interface TaskFormProps {
   task?: Task
   milestones: Milestone[]
+  workflowColumns: WorkflowColumn[]
   onCancel: () => void
   onSubmit: (values: TaskFormValues) => void
 }
 
-export function TaskForm({ task, milestones, onCancel, onSubmit }: TaskFormProps) {
+export function TaskForm({ task, milestones, workflowColumns, onCancel, onSubmit }: TaskFormProps) {
+  const initialColumn =
+    workflowColumns.find((column) => column.id === task?.columnId) ?? workflowColumns[0]
   const [values, setValues] = useState<TaskFormValues>({
     title: task?.title ?? '',
     description: task?.description ?? '',
-    status: task?.status ?? 'todo',
+    status: task?.status ?? statusFromWorkflowColumn(initialColumn),
+    columnId: task?.columnId ?? initialColumn?.id,
     priority: task?.priority ?? 'medium',
     color: task?.color ?? 'slate',
     dueDate: task?.dueDate ?? '',
@@ -80,13 +85,20 @@ export function TaskForm({ task, milestones, onCancel, onSubmit }: TaskFormProps
       />
       <div className="grid gap-4 md:grid-cols-2">
         <SelectField
-          label="Status"
-          value={values.status}
-          onChange={(event) => updateValue('status', event.target.value as TaskFormValues['status'])}
+          label="Workflow column"
+          value={values.columnId ?? ''}
+          onChange={(event) => {
+            const column = workflowColumns.find((item) => item.id === event.target.value)
+            setValues((current) => ({
+              ...current,
+              columnId: column?.id,
+              status: statusFromWorkflowColumn(column),
+            }))
+          }}
         >
-          {taskStatuses.map((status) => (
-            <option key={status} value={status}>
-              {taskStatusLabels[status]}
+          {workflowColumns.map((column) => (
+            <option key={column.id} value={column.id}>
+              {column.name}
             </option>
           ))}
         </SelectField>
