@@ -216,4 +216,10 @@ For full details, see [VERSIONING.md](./VERSIONING.md).
 
 ## License
 
-MIT license intended. Add a `LICENSE` file before publishing a formal release.
+This project is source-available for learning and portfolio review.
+
+You may view and study the code for personal and educational purposes, but you may not copy, redistribute, publish, resell, monetize, or use this project or modified versions commercially without written permission from the author.
+
+For commercial use, licensing, or permission requests, please contact the author.
+
+See the [LICENSE](LICENSE) file for details.
